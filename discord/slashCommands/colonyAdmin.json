@@ -1,0 +1,193 @@
+{
+  "guild_id": "911378124640514068",
+  "name": "colony-admin",
+  "description": "Manage which events you want to be logged into your discord",
+  "options": [
+    {
+      "type": 2,
+      "name": "colony",
+      "description": "Manage on which Colonies you want events to be logged into your discord",
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Add a new Colony you wants events to be logged into your discord",
+          "options": [
+            {
+              "type": 3,
+              "name": "address",
+              "description": "Enter the colony address",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Remove a Colony and all the associated events beeing loged into your discord",
+          "options": [
+            {
+              "type": 3,
+              "name": "colony",
+              "description": "Select which colony you want to remove",
+              "choices": [
+                {
+                  "name": "MetaColony",
+                  "value": "MetaColony"
+                },
+                {
+                  "name": "TestDAO",
+                  "value": "TestDAO"
+                }
+              ],
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "List Colonies on which you subcribed events to"
+        }
+      ]
+    },
+    {
+      "type": 2,
+      "name": "subscription",
+      "description": "Manage the events on the colony network you want to get published on your discord",
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Add a new events you want to get published on your discord",
+          "options": [
+            {
+              "type": 3,
+              "name": "colony",
+              "description": "Select on which of Your Colony you want to listen to",
+              "choices": [
+                {
+                  "name": "MetaColony",
+                  "value": "MetaColony"
+                },
+                {
+                  "name": "TestDAO",
+                  "value": "TestDAO"
+                }
+              ],
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "event",
+              "description": "Select which event",
+              "choices": [
+                {
+                  "name": "Motion Creation",
+                  "value": "Motion Creation"
+                },
+                {
+                  "name": "Token issuance",
+                  "value": "Token issuance"
+                }
+              ],
+              "required": true
+            },
+            {
+              "type": 7,
+              "name": "channel",
+              "description": "Select on which channel you would like this events to be publish to",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Remove an subscription to a Colony network event",
+          "options": [
+            {
+              "type": 3,
+              "name": "events",
+              "description": "Select which of the events you want to STOP beeing published",
+              "choices": [
+                {
+                  "name": "Motion creation on the MetaColony published in #motion-creation-logs",
+                  "value": "1"
+                },
+                {
+                  "name": "Token inssuance on the MetaColony published in #token-inssuance-logs",
+                  "value": "2"
+                }
+              ],
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "List all the events happenning on the Colony network you choosed to be published on your discord"
+        },
+        {
+          "type": 1,
+          "name": "update",
+          "description": "Update one of the events",
+          "options": [
+            {
+              "type": 3,
+              "name": "event",
+              "description": "Select which is the event you want to update",
+              "choices": [
+                {
+                  "name": "Motion creation on the MetaColony published in #motion-creation-logs",
+                  "value": "1"
+                },
+                {
+                  "name": "Token issuance on the MetaColony published in #token-inssuance-logs",
+                  "value": "2"
+                }
+              ],
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "colony",
+              "description": "Change the colony",
+              "choices": [
+                {
+                  "name": "MetaColony",
+                  "value": "MetaColony"
+                },
+                {
+                  "name": "TestDAO",
+                  "value": "TestDao"
+                }
+              ]
+            },
+            {
+              "type": 3,
+              "name": "events",
+              "description": "Change the event",
+              "choices": [
+                {
+                  "name": "Motion created",
+                  "value": "motion"
+                },
+                {
+                  "name": "Token issuance",
+                  "value": "token"
+                }
+              ]
+            },
+            {
+              "type": 7,
+              "name": "channel",
+              "description": "Change the discord channel"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "guild_id": "911378124640514068",
+  "name": "colony",
+  "description": "Configure what you what's happenning on the Colony network you want to get notified about",
+  "options": [
+    {
+      "type": 2,
+      "name": "user",
+      "description": "Link and manage relation between your Discord username and your Colony.io accounts",
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Add a wallet adress you want to get notified about",
+          "options": [
+            {
+              "type": 3,
+              "name": "address",
+              "description": "Enter the wallet address",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "delete",
+          "description": "Delete one of the wallet addresses you chose to get notified about",
+          "options": [
+            {
+              "type": 3,
+              "name": "address",
+              "description": "Select the address you want to remove from your watch list",
+              "choices": [
+                {
+                  "name": "0x8741Fb04b7d8f5A01e0ec1D454602Bc08BDB0c8c",
+                  "value": "0x8741Fb04b7d8f5A01e0ec1D454602Bc08BDB0c8c"
+                },
+                {
+                  "name": "0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+                  "value": "0x06450dee7fd2fb8e39061434babcfc05599a6fb8"
+                }
+              ],
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "List the address in your watch list"
+        }
+      ]
+    },
+    {
+      "type": 2,
+      "name": "subscription",
+      "description": "Manage your personal notification preferences ( ie : turn on notification on all Colony activity )",
+      "options": [
+        {
+          "type": 1,
+          "name": "add",
+          "description": "Add a new event you want to subscribe to",
+          "options": [
+            {
+              "type": 3,
+              "name": "colony",
+              "description": "Select on which colony you want to get notify about",
+              "choices": [
+                {
+                  "name": "MetaColony",
+                  "value": "MetaColony"
+                },
+                {
+                  "name": "TestDAO",
+                  "value": "TestDAO"
+                }
+              ],
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "event",
+              "description": "Select which event you want to get notify about",
+              "choices": [
+                {
+                  "name": "Motion creation",
+                  "value": "Motion creation"
+                },
+                {
+                  "name": "Motion sucess",
+                  "value": "Motion sucess"
+                }
+              ],
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "remove",
+          "description": "Remove an event you  don't want to subscribe to anymore",
+          "options": [
+            {
+              "type": 3,
+              "name": "colony",
+              "description": "Select on which colony you want to STOP getting notified about",
+              "choices": [
+                {
+                  "name": "MetaColony",
+                  "value": "MetaColony"
+                },
+                {
+                  "name": "TestDAO",
+                  "value": "TestDAO"
+                }
+              ],
+              "required": true
+            },
+            {
+              "type": 3,
+              "name": "event",
+              "description": "Select on which on which event you want to STOP getting notified about",
+              "choices": [
+                {
+                  "name": "Motion created",
+                  "value": "Motion created"
+                },
+                {
+                  "name": "Motion passed",
+                  "value": "Motion passed"
+                }
+              ],
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "list",
+          "description": "List the events you choose to subscribe to"
+        }
+      ]
+    }
+  ]
+}
