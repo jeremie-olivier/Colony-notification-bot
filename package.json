@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/jeremie-olivier/Colony-notification-bot#readme",
   "dependencies": {
-    "@colony/sdk": "^1.5.0"
+    "@colony/sdk": "^1.5.0",
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",

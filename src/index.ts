@@ -12,29 +12,40 @@ colonySubgraph.subscription
 
 // Get the latest DomainAddedEvents across all Colonies
 const QUERY = gql`
-  subscription DomainAddedEvents {
-    events(
-      orderDirection: desc
-      orderBy: timestamp
-      first: 1
-      where: { name_contains: "DomainAdded" }
-    ) {
-      id
-      address
-      associatedColony {
-        colonyAddress: id
+subscription Subscription($orderBy: OneTxPayment_orderBy, $orderDirection: OrderDirection, $first: Int) {
+  oneTxPayments(orderBy: $orderBy, orderDirection: $orderDirection, first: $first) {
+    nPayouts
+    payment {
+      colony {
+        ensName
+        id
       }
-      name
-      args
-      timestamp
+      fundingPot {
+        fundingPotPayouts {
+          amount
+        }
+      }
+      to
+      domain {
+        colonyAddress
+      }
+     
+    
     }
+    
   }
-`;
+}`
 
-console.info('Listening to new `DomainAdded` events...');
+const VARIABLES = {
+  "orderDirection": "desc",
+  "orderBy": "timestamp",
+  "first": 1,
+}
+
+console.info('Listening to new `PaymentsTx` events...');
 pipe(
-  colonySubgraph.subscription(QUERY),
+  colonySubgraph.subscription(QUERY, VARIABLES),
   subscribe((result) => {
-    console.info(result.data.events[0]);
+    console.info(JSON.stringify(result.data));
   }),
 );
