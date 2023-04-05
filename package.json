@@ -1,0 +1,22 @@
+{
+  "name": "colony-notification-bot",
+  "version": "0.0.1",
+  "description": "Discord notification bot for everything happening on the Colony network",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeremie-olivier/Colony-notification-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeremie-olivier/Colony-notification-bot/issues"
+  },
+  "homepage": "https://github.com/jeremie-olivier/Colony-notification-bot#readme",
+  "dependencies": {
+    "@colony/sdk": "^1.5.0"
+  }
+}
