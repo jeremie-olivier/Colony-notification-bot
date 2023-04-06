@@ -45,18 +45,19 @@ const VARIABLES = {
   "first": 1,
 }
 
-    console.log('Listening to new `PaymentsTx` events...');
+    console.log('New event :');
     
     const subscription = colonySubgraph.subscription(QUERY, VARIABLES);
     pipe(
       subscription,
       subscribe(async (result: { data?: any; error?: any; }) => {
-        console.info(JSON.stringify(result.data));
+
+        console.info("Last transaction :" + JSON.stringify(result.data));
         await client.login(TOKEN),
         client.once('ready', async () => {
-          console.info('Ready!');
+          
           const chan = client.channels.cache.get('1034582332478337106');
-              await chan.send(
+              await chan.send("Here de last transaction : \n"+"```json\n" +
               JSON.stringify(result.data)
             );
         })
