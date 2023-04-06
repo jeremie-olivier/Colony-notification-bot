@@ -1,8 +1,12 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from 'wonka';
+import dotenv from 'dotenv'
+dotenv.config();
+
 
 const Discord = require('discord.js');
 const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds] });
+const TOKEN = process.env.TOKEN;
 
 const colonySubgraph = createSubgraphClient();
 
@@ -48,7 +52,7 @@ const VARIABLES = {
       subscription,
       subscribe(async (result: { data?: any; error?: any; }) => {
         console.info(JSON.stringify(result.data));
-        await client.login('OTkzNDY3MDI5MzE3MjQyODkx.GGAOPZ.pPsLeyD026yhcFPNxdfxa-XHzEoNBu8qDMiDpA'),
+        await client.login(TOKEN),
         client.once('ready', async () => {
           console.info('Ready!');
           const chan = client.channels.cache.get('1034582332478337106');
