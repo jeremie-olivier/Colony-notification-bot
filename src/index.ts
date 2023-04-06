@@ -1,16 +1,15 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
-
-/*
- * A basic subscription within the Colony Subgraph. See urql's documentation here: https://formidable.com/open-source/urql/docs/advanced/subscriptions/#one-off-subscriptions for more information
- */
 import { pipe, subscribe } from 'wonka';
 
+const Discord = require('discord.js');
+const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds] });
 
 const colonySubgraph = createSubgraphClient();
 
 colonySubgraph.subscription
 
-// Get the latest DomainAddedEvents across all Colonies
+
+
 const QUERY = gql`
 subscription Subscription($orderBy: OneTxPayment_orderBy, $orderDirection: OrderDirection, $first: Int) {
   oneTxPayments(orderBy: $orderBy, orderDirection: $orderDirection, first: $first) {
@@ -42,10 +41,20 @@ const VARIABLES = {
   "first": 1,
 }
 
-console.info('Listening to new `PaymentsTx` events...');
-pipe(
-  colonySubgraph.subscription(QUERY, VARIABLES),
-  subscribe((result) => {
-    console.info(JSON.stringify(result.data));
-  }),
-);
+    console.log('Listening to new `PaymentsTx` events...');
+    
+    const subscription = colonySubgraph.subscription(QUERY, VARIABLES);
+    pipe(
+      subscription,
+      subscribe(async (result: { data?: any; error?: any; }) => {
+        console.info(JSON.stringify(result.data));
+        await client.login('OTkzNDY3MDI5MzE3MjQyODkx.GGAOPZ.pPsLeyD026yhcFPNxdfxa-XHzEoNBu8qDMiDpA'),
+        client.once('ready', async () => {
+          console.info('Ready!');
+          const chan = client.channels.cache.get('1034582332478337106');
+              await chan.send(
+              JSON.stringify(result.data)
+            );
+        })
+      }),
+    );

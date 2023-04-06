@@ -2,7 +2,7 @@
   "name": "colony-notification-bot",
   "version": "0.0.1",
   "description": "Discord notification bot for everything happening on the Colony network",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/index.ts"
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jeremie-olivier/Colony-notification-bot#readme",
   "dependencies": {
     "@colony/sdk": "^1.5.0",
+    "discord.js": "^14.9.0",
     "react": "^18.2.0"
   },
   "devDependencies": {
