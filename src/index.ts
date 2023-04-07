@@ -2,6 +2,7 @@ import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
 const Discord = require("discord.js");
+const { ethers } = require("ethers");
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -63,7 +64,9 @@ pipe(
         const chan = client.channels.cache.get("1034582332478337106");
         const paymentInfo = result.data.oneTxPayments[0].payment;
         const colonyName = `${paymentInfo.colony.ensName.split('.')[0]} Colony's`;
-        const fundingAmount = `${paymentInfo.fundingPot.fundingPotPayouts[0].amount}`;
+        const fundingAmountWei = `${paymentInfo.fundingPot.fundingPotPayouts[0].amount}`;
+        const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
+        const truncatedAmount = Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
         const recipient = `${paymentInfo.to}`;
         const colonyAddress = `${paymentInfo.domain.colonyAddress}`;
 
@@ -88,7 +91,7 @@ pipe(
             { name: "\u200B", value: "\u200B" },
             {
               name: "A total of :",
-              value: `${fundingAmount} Token`,
+              value: `${truncatedAmount} Token`,
               inline: true,
             }
           )
