@@ -12,7 +12,7 @@ dotenv.config();
 const client = new Discord.Client({
   intents: [Discord.GatewayIntentBits.Guilds],
 });
-const TOKEN = 'OTkzNDY3MDI5MzE3MjQyODkx.Gxigxm.SOYGMsguZOG3p3mNIFrTM5j43MJUCTnJoMY1Cs'
+const TOKEN = process.env.TOKEN
 
 const colonySubgraph = createSubgraphClient();
 
