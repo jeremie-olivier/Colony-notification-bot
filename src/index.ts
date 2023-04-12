@@ -1,18 +1,17 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
+import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
-const { MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
-const { ethers } = require("ethers");
-import { providers } from 'ethers';
-import { ColonyNetwork, ColonyRpcEndpoint } from '@colony/sdk';
+import { ethers } from "ethers";
+import { providers } from "ethers";
 import dotenv from "dotenv";
 dotenv.config();
 
 const client = new Discord.Client({
   intents: [Discord.GatewayIntentBits.Guilds],
 });
-const TOKEN = process.env.TOKEN
+const TOKEN = process.env.TOKEN;
 
 const colonySubgraph = createSubgraphClient();
 
@@ -34,6 +33,9 @@ const QUERY = gql`
         colony {
           ensName
           id
+          token {
+            symbol
+          }
         }
         fundingPot {
           fundingPotPayouts {
@@ -70,29 +72,38 @@ pipe(
         const colonyName = `${
           paymentInfo.colony.ensName.split(".")[0]
         } Colony's`;
+        const colonyTickers = paymentInfo.colony.token.symbol;
         const domainName = paymentInfo.domain.name;
-        const fundingAmountWei = `${paymentInfo.fundingPot.fundingPotPayouts[0].amount}`;
+        const fundingAmountWei =
+          paymentInfo.fundingPot.fundingPotPayouts[0].amount;
         const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
         const truncatedAmount =
           Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
-        const recipient = `${paymentInfo.to}`;
-        const colonyAddress = `${paymentInfo.domain.colonyAddress}`;
-        const provider = new providers.JsonRpcProvider(ColonyRpcEndpoint.Gnosis);
-        const signer = new ethers.Wallet("55f32b12ca4ee3ce5157d40f42a8cb0171aa37e39600e2a906aca01e966275bc", provider)
+        const recipient = paymentInfo.to;
+        const colonyAddress = paymentInfo.domain.colonyAddress;
+        const provider = new providers.JsonRpcProvider(
+          ColonyRpcEndpoint.Gnosis
+        );
+        const signer = new ethers.Wallet(
+          "55f32b12ca4ee3ce5157d40f42a8cb0171aa37e39600e2a906aca01e966275bc",
+          provider
+        );
         const colonyNetwork = await ColonyNetwork.init(provider);
         const recipientUsername = await colonyNetwork.getUsername(recipient);
 
         const embed = new EmbedBuilder()
           .setColor(0x1cae9f)
           .setTitle("New Payment")
-          .setDescription(`${truncatedAmount} CHR has been payed to ${recipientUsername} ${recipient}`)
+          .setDescription(
+            `${truncatedAmount} ${colonyTickers} has been payed to ${recipientUsername} ${recipient}`
+          )
           .setThumbnail(
             "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300482191430/Forced.png"
           )
           .setAuthor({
             name: `${colonyName}`,
-            url: "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png"
-            })
+            url: "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
+          })
           .addFields({ name: `In ${domainName} team.`, value: "\u200B" });
 
         const message = {
