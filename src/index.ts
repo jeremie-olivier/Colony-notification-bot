@@ -27,7 +27,8 @@ function listenToColonyEvent(): void {
   const subscription = getGqlSubscription(GQL, GQLVARIABLES)
   pipe(
     subscription,
-    subscribe(createAndSendMessage))
+    // @ts-ignore
+    subscribe(r => createAndSendMessage(r.data.oneTxPayments[0].payment)))
   }
   
 //when discord is ready
@@ -37,12 +38,13 @@ client.once("ready", listenToColonyEvent)
 
 
 
-async function createAndSendMessage(): Promise<void> {
+async function createAndSendMessage(result: any): Promise<void> {
   console.log(createAndSendMessage)
-   //const embed = getEmbed()
-    //const message = getDiscordMessage()
-    //const channel = getDiscordChannel()
-    //await channel.send(message);
+   let colonyPaymentData = await parsePaymentData(result)
+   const embed = getEmbed(colonyPaymentData)
+   const message = getDiscordMessage(embed)
+   const channel = getDiscordChannel()
+   await channel.send(message);
 }
 
 
@@ -103,17 +105,95 @@ function getGQLrequest(): any   {
 return QUERY
 }
 
-function getEmbed() {
-  
-   
-
+function getEmbed(p: colonyPaymentData) {
+  const embed = new EmbedBuilder()
+          .setColor(0x1cae9f)
+          .setTitle("New Payment")
+          .setDescription(
+            `${p.amountPayed} ${p.colonyTickers} has been payed to ${p.recipientUsername} ${p.recipient}`
+          )
+          .setThumbnail(
+            "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300482191430/Forced.png"
+          )
+          .setAuthor({
+            name: `${p.colonyName}`,
+            iconURL: "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
+          })
+          .addFields({ name: `In ${p.domainName} team.`, value: "\u200B" });
+          return embed
 }
-function getDiscordMessage() {
-    throw new Error("Function not implemented.")
+
+function getDiscordMessage(embed: any) {
+  const message = {
+    content: "@business",
+    tts: false,
+    components: [
+      {
+        type: 1,
+        components: [
+          {
+            style: 5,
+            label: "View transaction on Colony",
+            url: "https://xdai.colony.io/colony/chronodao/tx/0xa04eea13a88920facb23b9d305bcf8aadbcbaccda595a3c53d821be1a374df00",
+            disabled: false,
+            type: 2,
+          },
+        ],
+      },
+    ],
+    embeds: [embed],
+  };
+  return message
 }
 
 function getDiscordChannel() {
   const channel = client.channels.cache.get("1034582332478337106");
+  return channel
 }
 
+async function parsePaymentData (paymentInfo: any): Promise<colonyPaymentData> {
+  const fundingAmountWei =
+  paymentInfo.fundingPot.fundingPotPayouts[0].amount;
+  const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
+  const amountPayed =
+  Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
 
+  const provider = new providers.JsonRpcProvider(
+    
+    ColonyRpcEndpoint.Gnosis
+  );
+  const signer = new ethers.Wallet(
+    "55f32b12ca4ee3ce5157d40f42a8cb0171aa37e39600e2a906aca01e966275bc",
+    provider
+    );
+  
+  const recipient = paymentInfo.to;
+  const colonyNetwork = await ColonyNetwork.init(provider);
+  const recipientUsername = await colonyNetwork.getUsername(recipient);
+    
+  let paymentData: colonyPaymentData = {
+    colonyName: `${paymentInfo.colony.ensName.split(".")[0]} Colony's`,
+    colonyTickers: paymentInfo.colony.token.symbol, 
+    domainName: paymentInfo.domain.name,
+    recipientUsername,
+    colonyAdress: paymentInfo.domain.colonyAddress,
+    recipient,
+    amountPayed,
+  
+  }
+  return paymentData
+
+
+
+}
+
+interface colonyPaymentData {
+  colonyName : string;
+  colonyTickers : string;
+  domainName : string;
+  recipientUsername : string | null
+  colonyAdress : string,
+  recipient : string,
+  amountPayed : number,
+
+}
