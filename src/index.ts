@@ -1,4 +1,5 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
+//@ts-ignore
 import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
