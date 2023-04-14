@@ -5,7 +5,7 @@ const { EmbedBuilder } = require("discord.js");
 const Discord = require("discord.js");
 import { ethers } from "ethers";
 import { providers } from "ethers";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
 dotenv.config();
@@ -16,111 +16,106 @@ const client = new Discord.Client({
 const TOKEN = process.env.TOKEN;
 
 async function run(): Promise<any> {
-await client.login(TOKEN)
+  await client.login(TOKEN);
 }
-run()
+run();
 
 function listenToColonyEvent(): void {
-
-  const GQL = getGQLrequest() 
-  const GQLVARIABLES = getGqlVariables()
-  const subscription = getGqlSubscription(GQL, GQLVARIABLES)
+  const GQL = getGQLrequest();
+  const GQLVARIABLES = getGqlVariables();
+  const subscription = getGqlSubscription(GQL, GQLVARIABLES);
   pipe(
     subscription,
     // @ts-ignore
-    subscribe(r => createAndSendMessage(r.data.oneTxPayments[0].payment)))
-  }
-  
-//when discord is ready
-client.once("ready", listenToColonyEvent)
-
-
-
-
-
-async function createAndSendMessage(result: any): Promise<void> {
-  console.log(createAndSendMessage)
-   let colonyPaymentData = await parsePaymentData(result)
-   const embed = getEmbed(colonyPaymentData)
-   const message = getDiscordMessage(embed)
-   const channel = getDiscordChannel()
-   await channel.send(message);
+    subscribe((r) => createAndSendMessage(r.data.oneTxPayments[0].payment))
+  );
 }
 
+//when discord is ready
+client.once("ready", listenToColonyEvent);
 
+async function createAndSendMessage(result: any): Promise<void> {
+  console.log(createAndSendMessage);
+  let colonyPaymentData = await parsePaymentData(result);
+  const embed = getEmbed(colonyPaymentData);
+  const message = getDiscordMessage(embed);
+  const channel = getDiscordChannel();
+  await channel.send(message);
+}
 
-
-function getGqlVariables(): any  {
+function getGqlVariables(): any {
   const VARIABLES = {
     orderDirection: "desc",
     orderBy: "timestamp",
     first: 1,
   };
-return VARIABLES
+  return VARIABLES;
 }
 
-function getGqlSubscription(gql: string | DocumentNode | TypedDocumentNode<any, any>, variables: any): any   {
+function getGqlSubscription(
+  gql: string | DocumentNode | TypedDocumentNode<any, any>,
+  variables: any
+): any {
   const colonySubgraph = createSubgraphClient();
-  const subscription = colonySubgraph.subscription(gql, variables)
+  const subscription = colonySubgraph.subscription(gql, variables);
   return subscription;
-
-
 }
 
-function getGQLrequest(): any   {
+function getGQLrequest(): any {
   const QUERY = gql`
-  subscription Subscription(
-    $orderBy: OneTxPayment_orderBy
-    $orderDirection: OrderDirection
-    $first: Int
-  ) {
-    oneTxPayments(
-      orderBy: $orderBy
-      orderDirection: $orderDirection
-      first: $first
+    subscription Subscription(
+      $orderBy: OneTxPayment_orderBy
+      $orderDirection: OrderDirection
+      $first: Int
     ) {
-      nPayouts
-      payment {
-        colony {
-          ensName
-          id
-          token {
-            symbol
+      oneTxPayments(
+        orderBy: $orderBy
+        orderDirection: $orderDirection
+        first: $first
+      ) {
+        nPayouts
+        payment {
+          colony {
+            ensName
+            id
+            token {
+              symbol
+            }
           }
-        }
-        fundingPot {
-          fundingPotPayouts {
-            amount
+          fundingPot {
+            fundingPotPayouts {
+              amount
+            }
           }
-        }
-        to
-        domain {
-          colonyAddress
-          name
+          to
+          domain {
+            colonyAddress
+            name
+          }
         }
       }
     }
-  }
-`;
-return QUERY
+  `;
+  return QUERY;
 }
 
 function getEmbed(p: colonyPaymentData) {
   const embed = new EmbedBuilder()
-          .setColor(0x1cae9f)
-          .setTitle("New Payment")
-          .setDescription(
-            `${p.amountPayed} ${p.colonyTickers} has been payed to ${p.recipientUsername} ${p.recipient}`
-          )
-          .setThumbnail(
-            "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300482191430/Forced.png"
-          )
-          .setAuthor({
-            name: `${p.colonyName}`,
-            iconURL: "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
-          })
-          .addFields({ name: `In ${p.domainName} team.`, value: "\u200B" });
-          return embed
+    .setColor(0x1cae9f)
+    .setTitle("New Payment")
+    .setDescription(
+      `${p.amountPayed} ${p.colonyTickers} has been payed to ${p.recipientUsername} ${p.recipient}`
+    )
+    .setThumbnail(
+      "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300482191430/Forced.png"
+    )
+    .setAuthor({
+      name: `${p.colonyName}`,
+      iconURL:
+        "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
+    })
+    .addFields({ name: `In ${p.domainName} team.`, value: "\u200B" });
+  return embed;
 }
 
 function getDiscordMessage(embed: any) {
@@ -143,57 +138,47 @@ function getDiscordMessage(embed: any) {
     ],
     embeds: [embed],
   };
-  return message
+  return message;
 }
 
 function getDiscordChannel() {
   const channel = client.channels.cache.get("1034582332478337106");
-  return channel
+  return channel;
 }
 
-async function parsePaymentData (paymentInfo: any): Promise<colonyPaymentData> {
-  const fundingAmountWei =
-  paymentInfo.fundingPot.fundingPotPayouts[0].amount;
+async function parsePaymentData(paymentInfo: any): Promise<colonyPaymentData> {
+  const fundingAmountWei = paymentInfo.fundingPot.fundingPotPayouts[0].amount;
   const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
-  const amountPayed =
-  Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
+  const amountPayed = Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
 
-  const provider = new providers.JsonRpcProvider(
-    
-    ColonyRpcEndpoint.Gnosis
-  );
+  const provider = new providers.JsonRpcProvider(ColonyRpcEndpoint.Gnosis);
   const signer = new ethers.Wallet(
     "55f32b12ca4ee3ce5157d40f42a8cb0171aa37e39600e2a906aca01e966275bc",
     provider
-    );
-  
+  );
+
   const recipient = paymentInfo.to;
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
-    
+
   let paymentData: colonyPaymentData = {
     colonyName: `${paymentInfo.colony.ensName.split(".")[0]} Colony's`,
-    colonyTickers: paymentInfo.colony.token.symbol, 
+    colonyTickers: paymentInfo.colony.token.symbol,
     domainName: paymentInfo.domain.name,
     recipientUsername,
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient,
     amountPayed,
-  
-  }
-  return paymentData
-
-
-
+  };
+  return paymentData;
 }
 
 interface colonyPaymentData {
-  colonyName : string;
-  colonyTickers : string;
-  domainName : string;
-  recipientUsername : string | null
-  colonyAdress : string,
-  recipient : string,
-  amountPayed : number,
-
+  colonyName: string;
+  colonyTickers: string;
+  domainName: string;
+  recipientUsername: string | null;
+  colonyAdress: string;
+  recipient: string;
+  amountPayed: number;
 }

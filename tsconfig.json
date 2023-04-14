@@ -1,18 +1,15 @@
 {
-    "compilerOptions": {
-      "lib": ["es2018", "dom"],
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "noEmit": true,
-      "noImplicitAny": true,
-      "resolveJsonModule": true,
-      "esModuleInterop": true,
-      "strict": true,
-      "target": "es2018",
-      "types": ["node"],
-      "rootDir": "./"
-    },
-    "include": ["src/**/*", "examples/**/*"],
-    "exclude": ["node_modules"]
-  }
-  
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src/index.ts",
+  ],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+
+}
