@@ -21,6 +21,8 @@ async function run(): Promise<any> {
 }
 run();
 
+let lastTransaction: string;
+
 function listenToColonyEvent(): void {
   const GQL = getGQLrequest();
   const GQLVARIABLES = getGqlVariables();
@@ -28,7 +30,7 @@ function listenToColonyEvent(): void {
   pipe(
     subscription,
     // @ts-ignore
-    subscribe((r) => createAndSendMessage(r.data.oneTxPayments[0].payment))
+    subscribe((r) => createAndSendMessage(r.data.oneTxPayments[0]))
   );
 }
 
@@ -38,10 +40,15 @@ client.once("ready", listenToColonyEvent);
 async function createAndSendMessage(result: any): Promise<void> {
   console.log(createAndSendMessage);
   let colonyPaymentData = await parsePaymentData(result);
-  const embed = getEmbed(colonyPaymentData);
-  const message = getDiscordMessage(embed);
-  const channel = getDiscordChannel();
-  await channel.send(message);
+  console.log(colonyPaymentData.transactionId);
+  console.log(lastTransaction);
+  if (colonyPaymentData.transactionId != lastTransaction) {
+    const embed = getEmbed(colonyPaymentData);
+    const message = getDiscordMessage(embed);
+    const channel = getDiscordChannel();
+    await channel.send(message);
+    lastTransaction = colonyPaymentData.transactionId;
+  }
 }
 
 function getGqlVariables(): any {
@@ -93,6 +100,9 @@ function getGQLrequest(): any {
             colonyAddress
             name
           }
+        }
+        transaction {
+          id
         }
       }
     }
@@ -147,7 +157,8 @@ function getDiscordChannel() {
   return channel;
 }
 
-async function parsePaymentData(paymentInfo: any): Promise<colonyPaymentData> {
+async function parsePaymentData(data: any): Promise<colonyPaymentData> {
+  const paymentInfo = data.payment;
   const fundingAmountWei = paymentInfo.fundingPot.fundingPotPayouts[0].amount;
   const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
   const amountPayed = Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
@@ -170,6 +181,7 @@ async function parsePaymentData(paymentInfo: any): Promise<colonyPaymentData> {
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient,
     amountPayed,
+    transactionId: data.transaction.id,
   };
   return paymentData;
 }
@@ -182,4 +194,5 @@ interface colonyPaymentData {
   colonyAdress: string;
   recipient: string;
   amountPayed: number;
+  transactionId: string;
 }
