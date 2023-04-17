@@ -1,5 +1,4 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
-//@ts-ignore
 import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
@@ -9,12 +8,16 @@ import { providers } from "ethers";
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
+
+
 dotenv.config();
 
 const client = new Discord.Client({
   intents: [Discord.GatewayIntentBits.Guilds],
 });
 const TOKEN = process.env.TOKEN;
+const CHRONODAO = process.env.CHRONODAO_CHANNEL_ID
+const SERVERTEST = process.env.TEST_SERVER_CHANNEL_ID
 
 async function run(): Promise<any> {
   await client.login(TOKEN);
@@ -34,6 +37,7 @@ function listenToColonyEvent(): void {
   );
 }
 
+
 //when discord is ready
 client.once("ready", listenToColonyEvent);
 
@@ -42,12 +46,20 @@ async function createAndSendMessage(result: any): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
   console.log(colonyPaymentData.transactionId);
   console.log(lastTransaction);
-  if (colonyPaymentData.transactionId != lastTransaction) {
+  if (colonyPaymentData.transactionId != lastTransaction) 
+ 
+  {
     const embed = getEmbed(colonyPaymentData);
-    const message = getDiscordMessage(embed);
-    const channel = getDiscordChannel();
+    const message = getDiscordMessage(embed, colonyPaymentData);
+    const channel = getDiscordChannel(SERVERTEST);
     await channel.send(message);
     lastTransaction = colonyPaymentData.transactionId;
+
+    if (colonyPaymentData.colonyName === "chronodao"){
+      const channel = getDiscordChannel(CHRONODAO);
+
+      await channel.send(message);
+    }
   }
 }
 
@@ -115,7 +127,7 @@ function getEmbed(p: colonyPaymentData) {
     .setColor(0x1cae9f)
     .setTitle("New Payment")
     .setDescription(
-      `${p.amountPayed} ${p.colonyTickers} has been payed to ${p.recipientUsername} ${p.recipient}`
+      `**${p.amountPayed} ${p.colonyTickers}** has been payed to **${p.recipientUsername}** (${p.recipient})`
     )
     .setThumbnail(
       "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300482191430/Forced.png"
@@ -125,26 +137,37 @@ function getEmbed(p: colonyPaymentData) {
       iconURL:
         "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
     })
-    .addFields({ name: `In ${p.domainName} team.`, value: "\u200B" });
+    .addFields({ value: `In **${p.domainName}** team.`, name: "\u200B" });
   return embed;
 }
 
-function getDiscordMessage(embed: any) {
+function getDiscordMessage(embed: any, p: colonyPaymentData) {
+  let url= `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`
+  console.log(url)
   const message = {
-    content: "@business",
+   // content: "@business",
     tts: false,
     components: [
       {
         type: 1,
         components: [
           {
+            url: `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`,
             style: 5,
-            label: "View transaction on Colony",
-            url: "https://xdai.colony.io/colony/chronodao/tx/0xa04eea13a88920facb23b9d305bcf8aadbcbaccda595a3c53d821be1a374df00",
+            label: "Colony Tsx",
             disabled: false,
             type: 2,
           },
+          {
+            url: `https://gnosisscan.io/tx/${p.transactionId}`,
+            style: 5,
+            label: "Explorer Tsx",
+            disabled: false,
+            type: 2,
+          
+          },
         ],
+        
       },
     ],
     embeds: [embed],
@@ -152,8 +175,8 @@ function getDiscordMessage(embed: any) {
   return message;
 }
 
-function getDiscordChannel() {
-  const channel = client.channels.cache.get("1034582332478337106");
+function getDiscordChannel(channelId: string) {
+  const channel = client.channels.cache.get(channelId);
   return channel;
 }
 
@@ -169,17 +192,17 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     provider
   );
 
-  const recipient = paymentInfo.to;
+  const recipient: string = paymentInfo.to;
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
 
   let paymentData: colonyPaymentData = {
-    colonyName: `${paymentInfo.colony.ensName.split(".")[0]} Colony's`,
+    colonyName: paymentInfo.colony.ensName.split(".")[0],
     colonyTickers: paymentInfo.colony.token.symbol,
     domainName: paymentInfo.domain.name,
     recipientUsername,
     colonyAdress: paymentInfo.domain.colonyAddress,
-    recipient,
+    recipient: formatAddress(recipient),
     amountPayed,
     transactionId: data.transaction.id,
   };
@@ -195,4 +218,10 @@ interface colonyPaymentData {
   recipient: string;
   amountPayed: number;
   transactionId: string;
+}
+
+function formatAddress(address: string, size = 4) {
+  var first = address.slice(0, size + 1);
+  var last = address.slice(-size);
+  return first + "..." + last;
 }
