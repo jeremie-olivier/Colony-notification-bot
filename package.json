@@ -2,12 +2,12 @@
   "name": "colony-notification-bot",
   "version": "0.0.1",
   "description": "Discord notification bot for everything happening on the Colony network",
-  "main": "dist/motion.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start" : " node dist/motion.js",
-    "dev": "ts-node src/motion.ts"
+    "start" : " node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",

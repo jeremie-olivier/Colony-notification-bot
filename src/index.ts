@@ -63,14 +63,7 @@ async function createAndSendMessage(result: any): Promise<void> {
   }
 }
 
-function getGqlVariables(): any {
-  const VARIABLES = {
-    orderDirection: "desc",
-    orderBy: "timestamp",
-    first: 1,
-  };
-  return VARIABLES;
-}
+
 
 function getGqlSubscription(
   gql: string | DocumentNode | TypedDocumentNode<any, any>,
@@ -105,6 +98,10 @@ function getGQLrequest(): any {
           fundingPot {
             fundingPotPayouts {
               amount
+              token {
+                symbol
+                decimals
+              }
             }
           }
           to
@@ -120,6 +117,15 @@ function getGQLrequest(): any {
     }
   `;
   return QUERY;
+}
+
+function getGqlVariables(): any {
+  const VARIABLES = {
+    orderDirection: "desc",
+    orderBy: "timestamp",
+    first: 1,
+  };
+  return VARIABLES;
 }
 
 function getEmbed(p: colonyPaymentData) {
@@ -182,9 +188,10 @@ function getDiscordChannel(channelId: string) {
 
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
-  const fundingAmountWei = paymentInfo.fundingPot.fundingPotPayouts[0].amount;
-  const fundingAmountEth = ethers.utils.formatEther(fundingAmountWei);
-  const amountPayed = Math.floor(parseFloat(fundingAmountEth) * 100) / 100;
+  const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
+  const decimals = Math.pow(10, fundPot.token.decimals)
+  const fundingAmount = fundPot.amount / decimals;
+  const amountPayed = Math.floor(fundingAmount * 100 / 100);
 
   const provider = new providers.JsonRpcProvider(ColonyRpcEndpoint.Gnosis);
   const signer = new ethers.Wallet(
@@ -198,7 +205,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
 
   let paymentData: colonyPaymentData = {
     colonyName: paymentInfo.colony.ensName.split(".")[0],
-    colonyTickers: paymentInfo.colony.token.symbol,
+    colonyTickers: paymentInfo.fundingPot.fundingPotPayouts[0].token.symbol,
     domainName: paymentInfo.domain.name,
     recipientUsername,
     colonyAdress: paymentInfo.domain.colonyAddress,
@@ -207,7 +214,9 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     transactionId: data.transaction.id,
   };
   return paymentData;
+  
 }
+
 
 interface colonyPaymentData {
   colonyName: string;
