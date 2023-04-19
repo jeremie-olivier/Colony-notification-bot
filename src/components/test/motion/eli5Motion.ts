@@ -5,14 +5,14 @@ const Discord = require("discord.js");
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
+import { discordChannelIDs } from "../../../discordChannelIDs";
 
 
 dotenv.config();
 
 
-const SERVERTEST = process.env.TEST_ALL_MOTION_CHANNEL_ID;
 
-export async function runChronoDaoMotion(discordClient: any): Promise<any> {
+export async function runEli5Motion(discordClient: any): Promise<any> {
   const GQL = getGQLrequest();
   const subscription = getGqlSubscription(GQL);
   pipe(
@@ -35,7 +35,7 @@ async function createAndSendMessage(discordClient: any, result: any): Promise<vo
     const embed = getEmbed(colonyMotionData);
     const message = getDiscordMessage(embed, colonyMotionData);
      // @ts-ignore
-    const channel = getDiscordChannel(discordClient, SERVERTEST);
+    const channel = getDiscordChannel(discordClient, discordChannelIDs.test.eli5.motion);
     await channel.send(message);
   }
  }

@@ -1,3 +1,4 @@
+import { discordChannelIDs } from '../../../discordChannelIDs';
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
@@ -9,9 +10,8 @@ import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
 
-dotenv.config();
 
-const SERVERTEST = process.env.TEST_ALL_PAYMENT_CHANNEL_ID
+dotenv.config();
 
 
 export async function runChronoDaoPayment(discordClient: any): Promise<any> {
@@ -42,7 +42,7 @@ async function createAndSendMessage(discordClient: any, result: any,): Promise<v
     const embed = getEmbed(colonyPaymentData);
     const message = getDiscordMessage(embed, colonyPaymentData);
      // @ts-ignore
-    const channel = getDiscordChannel(discordClient, SERVERTEST);
+    const channel = getDiscordChannel(discordClient, discordChannelIDs.test.allForcedPayments);
     await channel.send(message);
     lastTransaction = colonyPaymentData.transactionId;
 

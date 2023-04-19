@@ -8,10 +8,10 @@ import { providers } from "ethers";
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
+import { discordChannelIDs } from "../../../discordChannelIDs";
 
 dotenv.config();
 
-const SHAPESHIFT = process.env.SHAPESHIFT_CHANNEL_ID
 
 
 
@@ -47,7 +47,7 @@ async function createAndSendMessage(discordClient: any, result: any,): Promise<v
 
     if (colonyPaymentData.colonyName === "shapeshift"){
          // @ts-ignore
-      const channel = getDiscordChannel(discordClient, SHAPESHIFT);
+      const channel = getDiscordChannel(discordClient, discordChannelIDs.test.shapeShift.forcedPayment);
 
       await channel.send(message);
     }
