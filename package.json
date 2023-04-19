@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "concurrently \"ts-node src/index.ts\" \"ts-node src/motion.ts\"",
-    "dev": "concurrently \"ts-node src/index.ts\" \"ts-node src/motion.ts\""
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,6 @@
   "homepage": "https://github.com/jeremie-olivier/Colony-notification-bot#readme",
   "dependencies": {
     "@colony/sdk": "^1.5.0",
-    "concurrently": "^8.0.1",
     "discord.js": "^14.9.0",
     "dotenv": "^16.0.3",
     "ethers": "5.3.0",

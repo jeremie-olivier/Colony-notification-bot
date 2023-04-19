@@ -1,5 +1,4 @@
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
-import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
 const Discord = require("discord.js");
@@ -10,34 +9,25 @@ import { DocumentNode } from "graphql";
 
 dotenv.config();
 
-const client = new Discord.Client({
-  intents: [Discord.GatewayIntentBits.Guilds],
-});
-const TOKEN = process.env.TOKEN;
-const ELI5 = process.env.ELI5_CHANNEL_ID;
-//const SERVERTEST = process.env.TEST_SERVER_CHANNEL_ID;
 
-async function run(): Promise<any> {
-  await client.login(TOKEN);
-}
-run();
+const SERVERTEST = process.env.TEST_ALL_MOTION_CHANNEL_ID;
 
-let lastMotion: string
-
-function listenToColonyEvent(): void {
+export async function runChronoDaoMotion(discordClient: any): Promise<any> {
   const GQL = getGQLrequest();
   const subscription = getGqlSubscription(GQL);
   pipe(
     subscription,
     // @ts-ignore
-    subscribe((r) => createAndSendMessage(r.data.motions[0]))
+    subscribe((r) => createAndSendMessage(discordClient, r.data.motions[0]))
   );
 }
 
-//when discord is ready
-client.once("ready", listenToColonyEvent);
 
-async function createAndSendMessage(result: any): Promise<void> {
+let lastMotion: string
+
+
+
+async function createAndSendMessage(discordClient: any, result: any): Promise<void> {
   console.log(createAndSendMessage);
   let colonyMotionData = await parseMotionData(result);
   if (colonyMotionData.transactionId != lastMotion) {
@@ -45,7 +35,7 @@ async function createAndSendMessage(result: any): Promise<void> {
     const embed = getEmbed(colonyMotionData);
     const message = getDiscordMessage(embed, colonyMotionData);
      // @ts-ignore
-    const channel = getDiscordChannel(ELI5);
+    const channel = getDiscordChannel(discordClient, SERVERTEST);
     await channel.send(message);
   }
  }
@@ -137,8 +127,8 @@ function getDiscordMessage(embed: any, p:colonyMotionData) {
   return message;
 }
 
-function getDiscordChannel(channelId: string) {
-  const channel = client.channels.cache.get(channelId);
+function getDiscordChannel(discordClient: any, channelId: string) {
+  const channel = discordClient.channels.cache.get(channelId);
   return channel;
 }
 
