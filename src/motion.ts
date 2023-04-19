@@ -14,7 +14,6 @@ const client = new Discord.Client({
   intents: [Discord.GatewayIntentBits.Guilds],
 });
 const TOKEN = process.env.TOKEN;
-
 const ELI5 = process.env.ELI5_CHANNEL_ID;
 //const SERVERTEST = process.env.TEST_SERVER_CHANNEL_ID;
 
