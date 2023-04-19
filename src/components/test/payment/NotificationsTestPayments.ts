@@ -33,10 +33,9 @@ let lastTransaction: string;
 
 
 async function createAndSendMessage(discordClient: any, result: any,): Promise<void> {
-  console.log(createAndSendMessage);
+
   let colonyPaymentData = await parsePaymentData(result);
-  console.log(colonyPaymentData.transactionId);
-  console.log(lastTransaction);
+  
   if (colonyPaymentData.transactionId != lastTransaction) 
  
   {
@@ -135,13 +134,13 @@ function getEmbed(p: colonyPaymentData) {
       iconURL:
         "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
     })
-    .addFields({ value: `In **${p.domainName}** team.`, name: "\u200B" });
+    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" });
   return embed;
 }
 
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
   let url= `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`
-  console.log(url)
+ 
   const message = {
    // content: "@business",
     tts: false,
@@ -195,11 +194,28 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
 
+  const domainMeta = paymentInfo.domain.metadata
+  let domain = paymentInfo.domain.name;
+  
+  if (domainMeta) {
+    try {
+      const response = await fetch(`https://gateway.pinata.cloud/ipfs/${domainMeta}`);
+      if (response.ok) {
+        const domainResponse: any = await response.text();
+        domain = JSON.parse(domainResponse).domainName
+        console.log(domainResponse)
+      }
+    } catch (error) {
+      console.error(`Error fetching IPFS domain: ${error}`);
+    }
+  }
+
+
   let paymentData: colonyPaymentData = {
     colonyName: paymentInfo.colony.ensName.split(".")[0],
     colonyTickers: paymentInfo.fundingPot.fundingPotPayouts[0].token.symbol,
-    domainName: paymentInfo.domain.name,
     recipientUsername,
+    domain,
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient: formatAddress(recipient),
     amountPayed,
@@ -213,7 +229,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
 interface colonyPaymentData {
   colonyName: string;
   colonyTickers: string;
-  domainName: string;
+  domain: string;
   recipientUsername: string | null;
   colonyAdress: string;
   recipient: string;
