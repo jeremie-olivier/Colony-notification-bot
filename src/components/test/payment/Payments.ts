@@ -132,7 +132,9 @@ function getEmbed(p: colonyPaymentData, config: any) {
       name: `${p.colonyName}`,
       iconURL: `${config.url}`,
     })
-    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" });
+    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
+    .setTimestamp()
+    .setFooter({ text: ' '}); 
   return embed;
 }
 
