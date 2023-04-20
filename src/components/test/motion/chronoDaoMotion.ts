@@ -29,7 +29,7 @@ let lastMotion: string
 
 
 async function createAndSendMessage(discordClient: any, result: any): Promise<void> {
-  console.log(createAndSendMessage);
+  
   let colonyMotionData = await parseMotionData(result);
   if (colonyMotionData.transactionId != lastMotion) {
 

@@ -16,7 +16,7 @@ export const discordChannelIDs = {
     }
   },
   eli5 : {
-    motion : "1097468726066020372",
+    motion : "1094283376837533846",
     forcedPayment : "",
   },
   shapeShift : {
@@ -24,3 +24,6 @@ export const discordChannelIDs = {
     forcedPayment : "1098238699650683001",
   }
 }
+
+
+

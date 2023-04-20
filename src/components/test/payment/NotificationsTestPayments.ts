@@ -203,7 +203,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
       if (response.ok) {
         const domainResponse: any = await response.text();
         domain = JSON.parse(domainResponse).domainName
-        console.log(domainResponse)
+     
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);
