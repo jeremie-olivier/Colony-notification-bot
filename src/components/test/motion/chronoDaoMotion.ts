@@ -1,3 +1,4 @@
+import { discordChannelIDs } from './../../../discordChannelIDs';
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
@@ -5,7 +6,7 @@ const Discord = require("discord.js");
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
-import { discordChannelIDs } from "../../../discordChannelIDs";
+
 
 
 dotenv.config();

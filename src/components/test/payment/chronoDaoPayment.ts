@@ -32,9 +32,10 @@ let lastTransaction: string;
 
 
 async function createAndSendMessage(discordClient: any, result: any,): Promise<void> {
-  
+  console.log(createAndSendMessage);
   let colonyPaymentData = await parsePaymentData(result);
-  
+  console.log(colonyPaymentData.transactionId);
+  console.log(lastTransaction);
   if (colonyPaymentData.transactionId != lastTransaction) 
  
   {
@@ -203,7 +204,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
       if (response.ok) {
         const domainResponse: any = await response.text();
         domain = JSON.parse(domainResponse).domainName
-        
+        console.log(domainResponse)
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);

@@ -33,9 +33,10 @@ let lastTransaction: string;
 
 
 async function createAndSendMessage(discordClient: any, result: any,): Promise<void> {
- 
+  console.log(createAndSendMessage);
   let colonyPaymentData = await parsePaymentData(result);
-
+  console.log(colonyPaymentData.transactionId);
+  console.log(lastTransaction);
   if (colonyPaymentData.transactionId != lastTransaction) 
  
   {
@@ -139,7 +140,8 @@ function getEmbed(p: colonyPaymentData) {
 }
 
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
-
+  let url= `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`
+  console.log(url)
   const message = {
    // content: "@business",
     tts: false,
