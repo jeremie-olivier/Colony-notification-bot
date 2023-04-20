@@ -1,13 +1,8 @@
 const Discord = require("discord.js");
-import {runChronoDaoPayment} from "./components/test/payment/chronoDaoPayment"
-import {runChronoDaoMotion} from "./components/test/motion/chronoDaoMotion"
-import {runShapeShiftPayment} from "./components/test/payment/shapeShiftPayment"
-import {runShapeShiftMotion} from "./components/test/motion/shapeShiftMotion"
-import {runEli5Motion} from "./components/test/motion/eli5Motion"
-import {runNotifTestPayment} from "./components/test/payment/NotificationsTestPayments"
-import {runNotifTestMotion} from "./components/test/motion/NotificationsTestMotiont"
+import {runPayment} from "./components/test/payment/Payments"
 
 import * as dotenv from "dotenv";
+import { ServerConfig } from "./ServerConfig";
 dotenv.config();
 
 
@@ -30,12 +25,9 @@ client.once("ready", listenToColonyEvent);
 
 
 function listenToColonyEvent(): void {
-runChronoDaoPayment(client)
-runShapeShiftPayment(client)
-runNotifTestPayment(client)
+runPayment(client, ServerConfig.test.notificationsTest)
+runPayment(client, ServerConfig.test.allForcedPayments)
+runPayment(client, ServerConfig.test.allMotions)
+//runPayment(client, ServerConfig.eli5.motion)
 
-runChronoDaoMotion(client)
-runEli5Motion(client)
-runShapeShiftMotion(client)
-runNotifTestMotion(client)
 }

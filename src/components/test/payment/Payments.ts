@@ -1,61 +1,58 @@
-import { discordChannelIDs } from '../../../discordChannelIDs';
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
-const Discord = require("discord.js");
 import { ethers } from "ethers";
 import { providers } from "ethers";
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
 
-
 dotenv.config();
 
+export async function runPayment(
+  discordClient: any,
+  config: any,
 
-export async function runChronoDaoPayment(discordClient: any): Promise<any> {
-    const GQL = getGQLrequest();
-    const GQLVARIABLES = getGqlVariables();
-    const subscription = getGqlSubscription(GQL, GQLVARIABLES);
-    pipe(
-      subscription,
+): Promise<any> {
+  const GQL = getGQLrequest();
+  const GQLVARIABLES = getGqlVariables();
+  const subscription = getGqlSubscription(GQL, GQLVARIABLES);
+  pipe(
+    subscription,
+    subscribe((r) =>
+    createAndSendMessage(
+      discordClient,
+      config,
       // @ts-ignore
-      subscribe((r) => createAndSendMessage(discordClient, r.data.oneTxPayments[0]))
-    );
- 
+        r.data.oneTxPayments[0]
+      )
+    )
+  );
 }
-
 
 let lastTransaction: string;
 
-
-
-async function createAndSendMessage(discordClient: any, result: any,): Promise<void> {
-  console.log(createAndSendMessage);
+async function createAndSendMessage(
+  discordClient: any,
+  config: any,
+  result: any
+): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
-  console.log(colonyPaymentData.transactionId);
-  console.log(lastTransaction);
-  if (colonyPaymentData.transactionId != lastTransaction) 
- 
-  {
+
+  if (colonyPaymentData.transactionId != lastTransaction) {
     const embed = getEmbed(colonyPaymentData);
     const message = getDiscordMessage(embed, colonyPaymentData);
-     // @ts-ignore
-    const channel = getDiscordChannel(discordClient, discordChannelIDs.test.allForcedPayments);
-    await channel.send(message);
     lastTransaction = colonyPaymentData.transactionId;
 
-    // if (colonyPaymentData.colonyName === "chronodao"){
-    //      // @ts-ignore
-    //   const channel = getDiscordChannel(discordClient, CHRONODAO);
-
-    //   await channel.send(message);
-    // }
+    console.log(colonyPaymentData);
+    console.log(config);
+    if (colonyPaymentData.colonyName != config.colony) return;
+    // @ts-ignore
+    const channel = getDiscordChannel(discordClient, config.payment);
+    await channel.send(message);
   }
 }
-
-
 
 function getGqlSubscription(
   gql: string | DocumentNode | TypedDocumentNode<any, any>,
@@ -140,9 +137,8 @@ function getEmbed(p: colonyPaymentData) {
 }
 
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
-
   const message = {
-   // content: "@business",
+    // content: "@business",
     tts: false,
     components: [
       {
@@ -161,10 +157,8 @@ function getDiscordMessage(embed: any, p: colonyPaymentData) {
             label: "Explorer Tsx",
             disabled: false,
             type: 2,
-          
           },
         ],
-        
       },
     ],
     embeds: [embed],
@@ -172,7 +166,10 @@ function getDiscordMessage(embed: any, p: colonyPaymentData) {
   return message;
 }
 
-function getDiscordChannel(discordCient: { channels: { cache: { get: (arg0: string) => any; }; }; },channelId: string) {
+function getDiscordChannel(
+  discordCient: { channels: { cache: { get: (arg0: string) => any } } },
+  channelId: string
+) {
   const channel = discordCient.channels.cache.get(channelId);
   return channel;
 }
@@ -180,9 +177,9 @@ function getDiscordChannel(discordCient: { channels: { cache: { get: (arg0: stri
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
-  const decimals = Math.pow(10, fundPot.token.decimals)
+  const decimals = Math.pow(10, fundPot.token.decimals);
   const fundingAmount = fundPot.amount / decimals;
-  const amountPayed = Math.floor(fundingAmount * 100 / 100);
+  const amountPayed = Math.floor((fundingAmount * 100) / 100);
 
   const provider = new providers.JsonRpcProvider(ColonyRpcEndpoint.Gnosis);
   const signer = new ethers.Wallet(
@@ -194,17 +191,17 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
 
-
-    const domainMeta = paymentInfo.domain.metadata
+  const domainMeta = paymentInfo.domain.metadata;
   let domain = paymentInfo.domain.name;
-  
+
   if (domainMeta) {
     try {
-      const response = await fetch(`https://gateway.pinata.cloud/ipfs/${domainMeta}`);
+      const response = await fetch(
+        `https://gateway.pinata.cloud/ipfs/${domainMeta}`
+      );
       if (response.ok) {
         const domainResponse: any = await response.text();
-        domain = JSON.parse(domainResponse).domainName
-        console.log(domainResponse)
+        domain = JSON.parse(domainResponse).domainName;
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);
@@ -222,9 +219,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     transactionId: data.transaction.id,
   };
   return paymentData;
-  
 }
-
 
 interface colonyPaymentData {
   colonyName: string;
@@ -242,5 +237,3 @@ function formatAddress(address: string, size = 4) {
   var last = address.slice(-size);
   return first + "..." + last;
 }
-
-
