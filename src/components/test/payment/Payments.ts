@@ -41,7 +41,7 @@ async function createAndSendMessage(
   let colonyPaymentData = await parsePaymentData(result);
 
   if (colonyPaymentData.transactionId != lastTransaction) {
-    const embed = getEmbed(colonyPaymentData);
+    const embed = getEmbed(colonyPaymentData, config);
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
@@ -49,7 +49,7 @@ async function createAndSendMessage(
     console.log(config);
     if (colonyPaymentData.colonyName != config.colony) return;
     // @ts-ignore
-    const channel = getDiscordChannel(discordClient, config.payment);
+    const channel = getDiscordChannel(discordClient, config.forcedPayment);
     await channel.send(message);
   }
 }
@@ -95,6 +95,7 @@ function getGQLrequest(): any {
           }
           to
           domain {
+            metadata
             colonyAddress
             name
           }
@@ -117,7 +118,7 @@ function getGqlVariables(): any {
   return VARIABLES;
 }
 
-function getEmbed(p: colonyPaymentData) {
+function getEmbed(p: colonyPaymentData, config: any) {
   const embed = new EmbedBuilder()
     .setColor(0x1cae9f)
     .setTitle("New Payment")
@@ -129,8 +130,7 @@ function getEmbed(p: colonyPaymentData) {
     )
     .setAuthor({
       name: `${p.colonyName}`,
-      iconURL:
-        "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7369b-9a87-4c24-b8e0-99d71ff068ba-profile_image-70x70.png",
+      iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" });
   return embed;
