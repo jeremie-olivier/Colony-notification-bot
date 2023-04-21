@@ -85,10 +85,10 @@ function getGqlSubscription(
 function getEmbed(p: colonyMotionData, config: any) {
   const embed = new EmbedBuilder()
     .setColor(0xf7c325)
-    .setTitle("New Motion")
+    .setTitle("New Motion Eve,t")
     .setDescription(
-      `**New Motion stake** : (${p.motionStake}) 
-      Work in progress...`
+      `**Motion details : Work in progress ( coming soon )
+       (${p.motionStake})`
     )
     .setThumbnail(
       "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300297625771/Motion.png"
@@ -99,7 +99,7 @@ function getEmbed(p: colonyMotionData, config: any) {
     })
     .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" })
     .setTimestamp()
-    .setFooter({ text: " " });
+    .setFooter({ text: `**Tsx : ${p.transactionId}**` });
   return embed;
 }
 
