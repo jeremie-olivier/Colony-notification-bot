@@ -9,8 +9,8 @@ export const ServerConfig= {
       url : "https://gateway.ipfscdn.io/ipfs/bafkreifiy2lytozak6cfc34firnnna23nk3pwqw26ucael3esphhcfo4ry"
     },
     shapeShift : {
-      motion : "1098238699650683001",
-      forcedPayment : "1098238699650683001",
+      motion : "1098020602809430169",
+      forcedPayment : "1098020417161138316",
       colony : "shapeshift",
       url : "https://cdn.stamp.fyi/space/shapeshiftdao.eth?s=164"
     },
@@ -31,7 +31,7 @@ export const ServerConfig= {
     motion : "1098238699650683001",
     forcedPayment : "1098238699650683001",
     colony : "shapeshift",
-    url : "",
+    url : "https://cdn.stamp.fyi/space/shapeshiftdao.eth?s=164",
   }
 }
 

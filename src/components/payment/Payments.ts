@@ -45,8 +45,7 @@ async function createAndSendMessage(
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
-    console.log(colonyPaymentData);
-    console.log(config);
+    
     if (colonyPaymentData.colonyName != config.colony) return;
     // @ts-ignore
     const channel = getDiscordChannel(discordClient, config.forcedPayment);
@@ -132,10 +131,14 @@ function getEmbed(p: colonyPaymentData, config: any) {
       name: `${p.colonyName}`,
       iconURL: `${config.url}`,
     })
-    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" });
+    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
+   
+    
+    .setTimestamp()
+    .setFooter({ text: `Tsx : ${p.transactionId}`}); 
+
   return embed;
 }
-
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
   const message = {
     // content: "@business",
@@ -187,6 +190,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     provider
   );
 
+  const TsxId: string = data.transaction.id
   const recipient: string = paymentInfo.to;
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
@@ -216,7 +220,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient: formatAddress(recipient),
     amountPayed,
-    transactionId: data.transaction.id,
+    transactionId: formatAddress(TsxId)
   };
   return paymentData;
 }
@@ -237,3 +241,5 @@ function formatAddress(address: string, size = 4) {
   var last = address.slice(-size);
   return first + "..." + last;
 }
+
+

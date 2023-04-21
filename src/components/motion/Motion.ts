@@ -1,4 +1,4 @@
-import { ServerConfig } from "../../../ServerConfig";
+import { ServerConfig } from "../../ServerConfig";
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
@@ -38,6 +38,8 @@ async function createAndSendMessage(
     const embed = getEmbed(colonyMotionData, config);
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
+    console.log(colonyMotionData)
+    console.log(config)
 
     if (colonyMotionData.colonyName != config.colony) return;
     // @ts-ignore
