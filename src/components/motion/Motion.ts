@@ -38,11 +38,12 @@ async function createAndSendMessage(
     const embed = getEmbed(colonyMotionData, config);
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
-    console.log(colonyMotionData)
-    console.log(config)
+    console.log(colonyMotionData);
+    console.log(config);
 
     if (colonyMotionData.colonyName != config.colony) return;
     // @ts-ignore
+    if (!config.motion) return;
     const channel = getDiscordChannel(discordClient, config.motion);
     await channel.send(message);
   }
@@ -98,7 +99,7 @@ function getEmbed(p: colonyMotionData, config: any) {
     })
     .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" })
     .setTimestamp()
-    .setFooter({ text: ' '}); 
+    .setFooter({ text: " " });
   return embed;
 }
 

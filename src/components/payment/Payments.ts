@@ -12,8 +12,7 @@ dotenv.config();
 
 export async function runPayment(
   discordClient: any,
-  config: any,
-
+  config: any
 ): Promise<any> {
   const GQL = getGQLrequest();
   const GQLVARIABLES = getGqlVariables();
@@ -21,10 +20,10 @@ export async function runPayment(
   pipe(
     subscription,
     subscribe((r) =>
-    createAndSendMessage(
-      discordClient,
-      config,
-      // @ts-ignore
+      createAndSendMessage(
+        discordClient,
+        config,
+        // @ts-ignore
         r.data.oneTxPayments[0]
       )
     )
@@ -45,9 +44,9 @@ async function createAndSendMessage(
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
-    
     if (colonyPaymentData.colonyName != config.colony) return;
     // @ts-ignore
+    if (!config.forcedPayment) return;
     const channel = getDiscordChannel(discordClient, config.forcedPayment);
     await channel.send(message);
   }
@@ -132,10 +131,9 @@ function getEmbed(p: colonyPaymentData, config: any) {
       iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
-   
-    
+
     .setTimestamp()
-    .setFooter({ text: `Tsx : ${p.transactionId}`}); 
+    .setFooter({ text: `Tsx : ${p.transactionId}` });
 
   return embed;
 }
@@ -190,7 +188,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     provider
   );
 
-  const TsxId: string = data.transaction.id
+  const TsxId: string = data.transaction.id;
   const recipient: string = paymentInfo.to;
   const colonyNetwork = await ColonyNetwork.init(provider);
   const recipientUsername = await colonyNetwork.getUsername(recipient);
@@ -220,7 +218,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient: formatAddress(recipient),
     amountPayed,
-    transactionId: formatAddress(TsxId)
+    transactionId: formatAddress(TsxId),
   };
   return paymentData;
 }
@@ -241,5 +239,3 @@ function formatAddress(address: string, size = 4) {
   var last = address.slice(-size);
   return first + "..." + last;
 }
-
-
