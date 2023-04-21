@@ -35,7 +35,7 @@ async function createAndSendMessage(
   let colonyMotionData = await parseMotionData(result);
 
   if (colonyMotionData.transactionId != lastMotion) {
-    const embed = getEmbed(colonyMotionData, config);
+    const embed = getEmbed(colonyMotionData, config, result.transaction.block.timestamp);
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
     console.log(colonyMotionData);
@@ -60,6 +60,9 @@ function getGQLrequest(): any {
         requiredStake
         transaction {
           id
+          block {
+            timestamp
+          }
         }
         associatedColony {
           id
@@ -82,10 +85,10 @@ function getGqlSubscription(
   return subscription;
 }
 
-function getEmbed(p: colonyMotionData, config: any) {
+function getEmbed(p: colonyMotionData, config: any, timestamp: number) {
   const embed = new EmbedBuilder()
     .setColor(0xf7c325)
-    .setTitle("New Motion Eve,t")
+    .setTitle("New Motion Event")
     .setDescription(
       `**Motion details : Work in progress ( coming soon )
        (${p.motionStake})`
@@ -98,8 +101,7 @@ function getEmbed(p: colonyMotionData, config: any) {
       iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" })
-    .setTimestamp()
-    .setFooter({ text: `**Tsx : ${p.transactionId}**` });
+    .setFooter({ text: `Tsx : ${p.transactionId} - ${new Date(timestamp*1000).toUTCString()}` });
   return embed;
 }
 
@@ -140,12 +142,13 @@ function getDiscordChannel(discordClient: any, channelId: string) {
 
 async function parseMotionData(data: any): Promise<colonyMotionData> {
   const motionInfo = data;
+  const TsxId: string = motionInfo.transaction.id;
   const motionData: colonyMotionData = {
     motionStake: motionInfo.stakes,
     motionDomain: motionInfo.domain.name,
     colonyName: motionInfo.associatedColony.ensName.split(".")[0],
     colonyTickers: motionInfo.associatedColony.token.symbol,
-    transactionId: motionInfo.transaction.id,
+    transactionId: formatAddress(TsxId),
     requiredStake: motionInfo.requiredStake,
   };
   return motionData;
@@ -158,4 +161,10 @@ interface colonyMotionData {
   colonyTickers: string;
   transactionId: string;
   requiredStake: string;
+}
+
+function formatAddress(address: string, size = 4) {
+  var first = address.slice(0, size + 1);
+  var last = address.slice(-size);
+  return first + "..." + last;
 }

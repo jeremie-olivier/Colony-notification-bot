@@ -40,7 +40,7 @@ async function createAndSendMessage(
   let colonyPaymentData = await parsePaymentData(result);
 
   if (colonyPaymentData.transactionId != lastTransaction) {
-    const embed = getEmbed(colonyPaymentData, config);
+    const embed = getEmbed(colonyPaymentData, config, result.transaction.block.timestamp);
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
@@ -100,6 +100,9 @@ function getGQLrequest(): any {
         }
         transaction {
           id
+          block {
+            timestamp
+          }
         }
       }
     }
@@ -116,7 +119,7 @@ function getGqlVariables(): any {
   return VARIABLES;
 }
 
-function getEmbed(p: colonyPaymentData, config: any) {
+function getEmbed(p: colonyPaymentData, config: any, timestamp: number) {
   const embed = new EmbedBuilder()
     .setColor(0x1cae9f)
     .setTitle("New Payment")
@@ -131,10 +134,7 @@ function getEmbed(p: colonyPaymentData, config: any) {
       iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
-
-    .setTimestamp()
-    .setFooter({ text: `Tsx : ${p.transactionId}` });
-
+    .setFooter({ text: `Tsx : ${p.transactionId} - ${new Date(timestamp*1000).toUTCString()}` });
   return embed;
 }
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
