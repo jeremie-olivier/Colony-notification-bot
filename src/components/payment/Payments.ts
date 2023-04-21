@@ -44,6 +44,7 @@ async function createAndSendMessage(
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
+    console.log("config",config)
     if (colonyPaymentData.colonyName != config.colony) return;
     // @ts-ignore
     if (!config.forcedPayment) return;
@@ -177,6 +178,7 @@ function getDiscordChannel(
 
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
+  console.log("payment info", paymentInfo)
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
   const decimals = Math.pow(10, fundPot.token.decimals);
   const fundingAmount = fundPot.amount / decimals;
@@ -195,15 +197,19 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
 
   const domainMeta = paymentInfo.domain.metadata;
   let domain = paymentInfo.domain.name;
-
+  //console.log("domainMeta",domainMeta)
   if (domainMeta) {
+    
     try {
       const response = await fetch(
         `https://gateway.pinata.cloud/ipfs/${domainMeta}`
       );
-      if (response.ok) {
+      //console.log(response)
+      if (response.status == 200) {
         const domainResponse: any = await response.text();
-        domain = JSON.parse(domainResponse).domainName;
+        
+        domain = JSON.parse(domainResponse).data.domainName;
+        //console.log("Domain",domain)
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);

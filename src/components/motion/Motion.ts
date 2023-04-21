@@ -1,4 +1,3 @@
-import { ServerConfig } from "../../ServerConfig";
 import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
@@ -11,7 +10,8 @@ dotenv.config();
 
 export async function runMotion(discordClient: any, config: any): Promise<any> {
   const GQL = getGQLrequest();
-  const subscription = getGqlSubscription(GQL);
+  const GQLVARIABLES = getGqlVariables();
+  const subscription = getGqlSubscription(GQL, GQLVARIABLES);
   pipe(
     subscription,
     subscribe((r) =>
@@ -35,7 +35,11 @@ async function createAndSendMessage(
   let colonyMotionData = await parseMotionData(result);
 
   if (colonyMotionData.transactionId != lastMotion) {
-    const embed = getEmbed(colonyMotionData, config, result.transaction.block.timestamp);
+    const embed = getEmbed(
+      colonyMotionData,
+      config,
+      result.transaction.block.timestamp
+    );
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
     console.log(colonyMotionData);
@@ -51,18 +55,27 @@ async function createAndSendMessage(
 
 function getGQLrequest(): any {
   const QUERY = gql`
-    subscription Subscription {
-      motions {
+    subscription Subscription(
+      $orderBy: Motion_orderBy
+      $orderDirection: OrderDirection
+      $first: Int
+    ) {
+      motions(
+        orderBy: $orderBy
+        orderDirection: $orderDirection
+        first: $first
+      ) {
         stakes
         domain {
           name
+          metadata
         }
         requiredStake
         transaction {
-          id
           block {
             timestamp
           }
+		  id
         }
         associatedColony {
           id
@@ -77,11 +90,21 @@ function getGQLrequest(): any {
   return QUERY;
 }
 
+function getGqlVariables(): any {
+  const VARIABLES = {
+    orderDirection: "desc",
+    orderBy: "fundamentalChainId",
+    first: 1,
+  };
+  return VARIABLES;
+}
+
 function getGqlSubscription(
-  gql: string | DocumentNode | TypedDocumentNode<any, any>
+  gql: string | DocumentNode | TypedDocumentNode<any, any>,
+  variables: any
 ): any {
   const colonySubgraph = createSubgraphClient();
-  const subscription = colonySubgraph.subscription(gql);
+  const subscription = colonySubgraph.subscription(gql, variables);
   return subscription;
 }
 
@@ -100,8 +123,12 @@ function getEmbed(p: colonyMotionData, config: any, timestamp: number) {
       name: `${p.colonyName}`,
       iconURL: `${config.url}`,
     })
-    .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" })
-    .setFooter({ text: `Tsx : ${p.transactionId} - ${new Date(timestamp*1000).toUTCString()}` });
+    .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
+    .setFooter({
+      text: `Tsx : ${p.transactionId} - ${new Date(
+        timestamp * 1000
+      ).toUTCString()}`,
+    });
   return embed;
 }
 
@@ -143,9 +170,30 @@ function getDiscordChannel(discordClient: any, channelId: string) {
 async function parseMotionData(data: any): Promise<colonyMotionData> {
   const motionInfo = data;
   const TsxId: string = motionInfo.transaction.id;
-  const motionData: colonyMotionData = {
+  console.log("motiofdfdsfsdfdsn",motionInfo)
+  const domainMeta = motionInfo.domain.metadata;
+    let domain = motionInfo.domain.name;
+    console.log("domainMeta",domainMeta)
+  if (domainMeta) {
+    try {
+      const response = await fetch(
+        `https://gateway.pinata.cloud/ipfs/${domainMeta}`
+      );
+      console.log(response)
+      if (response.status == 200) {
+        const domainResponse: any = await response.text();
+        domain = JSON.parse(domainResponse).data.domainName;
+        console.log("Domain",domain)
+      }
+    } catch (error) {
+      console.error(`Error fetching IPFS domain: ${error}`);
+    }
+  }
+
+  let motionData: colonyMotionData = {
     motionStake: motionInfo.stakes,
     motionDomain: motionInfo.domain.name,
+    domain,
     colonyName: motionInfo.associatedColony.ensName.split(".")[0],
     colonyTickers: motionInfo.associatedColony.token.symbol,
     transactionId: formatAddress(TsxId),
@@ -157,6 +205,7 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
 interface colonyMotionData {
   motionStake: string;
   motionDomain: string;
+  domain: string;
   colonyName: string;
   colonyTickers: string;
   transactionId: string;
