@@ -29,11 +29,11 @@ function listenToColonyEvent(): void {
 
 runPayment(client, ServerConfig.test.notificationsTest)
 runPayment(client, ServerConfig.shapeShift)
-//runPayment(client, ServerConfig.test.allForcedPayments)
+
 
 runMotion(client, ServerConfig.test.notificationsTest)
 runMotion(client, ServerConfig.shapeShift)
 runMotion(client, ServerConfig.eli5)
-//runMotion(client, ServerConfig.test.allMotions)
+
 
 }

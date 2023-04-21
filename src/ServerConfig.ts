@@ -1,7 +1,5 @@
 export const ServerConfig= {
   test : {
-    allForcedPayments : "1034582332478337106",
-    allMotions : "1098245013093224449",
     eli5 : {
       motion : "1097468726066020372",
       forcedPayment : "",
@@ -23,7 +21,7 @@ export const ServerConfig= {
   },
   eli5 : {
     motion : "1094283376837533846",
-    forcedPayment : "",
+    forcedPayment : "1094283376837533846",
     colony : "eli5",
     url : "https://gateway.ipfscdn.io/ipfs/bafkreifiy2lytozak6cfc34firnnna23nk3pwqw26ucael3esphhcfo4ry",
   },

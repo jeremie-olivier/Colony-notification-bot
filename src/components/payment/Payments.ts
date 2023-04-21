@@ -44,7 +44,7 @@ async function createAndSendMessage(
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
-    console.log("config",config)
+    //console.log("config",config)
     if (colonyPaymentData.colonyName != config.colony) return;
     // @ts-ignore
     if (!config.forcedPayment) return;
@@ -115,7 +115,7 @@ function getGqlVariables(): any {
   const VARIABLES = {
     orderDirection: "desc",
     orderBy: "timestamp",
-    first: 1,
+    first: 10,
   };
   return VARIABLES;
 }
@@ -147,14 +147,14 @@ function getDiscordMessage(embed: any, p: colonyPaymentData) {
         type: 1,
         components: [
           {
-            url: `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`,
+            url: `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.tsxId}`,
             style: 5,
             label: "Colony Tsx",
             disabled: false,
             type: 2,
           },
           {
-            url: `https://gnosisscan.io/tx/${p.transactionId}`,
+            url: `https://gnosisscan.io/tx/${p.tsxId}`,
             style: 5,
             label: "Explorer Tsx",
             disabled: false,
@@ -178,7 +178,7 @@ function getDiscordChannel(
 
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
-  console.log("payment info", paymentInfo)
+  //console.log("payment info", paymentInfo)
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
   const decimals = Math.pow(10, fundPot.token.decimals);
   const fundingAmount = fundPot.amount / decimals;
@@ -212,7 +212,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
         //console.log("Domain",domain)
       }
     } catch (error) {
-      console.error(`Error fetching IPFS domain: ${error}`);
+      //console.error(`Error fetching IPFS domain: ${error}`);
     }
   }
 
@@ -225,6 +225,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     recipient: formatAddress(recipient),
     amountPayed,
     transactionId: formatAddress(TsxId),
+    tsxId: data.transaction.id,
   };
   return paymentData;
 }
@@ -238,6 +239,7 @@ interface colonyPaymentData {
   recipient: string;
   amountPayed: number;
   transactionId: string;
+  tsxId: string,
 }
 
 function formatAddress(address: string, size = 4) {

@@ -94,7 +94,7 @@ function getGqlVariables(): any {
   const VARIABLES = {
     orderDirection: "desc",
     orderBy: "fundamentalChainId",
-    first: 1,
+    first: 10,
   };
   return VARIABLES;
 }
@@ -113,8 +113,7 @@ function getEmbed(p: colonyMotionData, config: any, timestamp: number) {
     .setColor(0xf7c325)
     .setTitle("New Motion Event")
     .setDescription(
-      `**Motion details : Work in progress ( coming soon )
-       (${p.motionStake})`
+      `**Motion details** : Work in progress ( coming soon )`
     )
     .setThumbnail(
       "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300297625771/Motion.png"
@@ -141,14 +140,14 @@ function getDiscordMessage(embed: any, p: colonyMotionData) {
         type: 1,
         components: [
           {
-            url: `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.transactionId}`,
+            url: `https://xdai.colony.io/colony/${p.colonyName}/tx/${p.tsxId}`,
             style: 5,
             label: "Colony Tsx",
             disabled: false,
             type: 2,
           },
           {
-            url: `https://gnosisscan.io/tx/${p.transactionId}`,
+            url: `https://gnosisscan.io/tx/${p.tsxId}`,
             style: 5,
             label: "Explorer Tsx",
             disabled: false,
@@ -170,7 +169,7 @@ function getDiscordChannel(discordClient: any, channelId: string) {
 async function parseMotionData(data: any): Promise<colonyMotionData> {
   const motionInfo = data;
   const TsxId: string = motionInfo.transaction.id;
-  console.log("motiofdfdsfsdfdsn",motionInfo)
+  //console.log("motiofdfdsfsdfdsn",motionInfo)
   const domainMeta = motionInfo.domain.metadata;
     let domain = motionInfo.domain.name;
     console.log("domainMeta",domainMeta)
@@ -182,7 +181,8 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
       console.log(response)
       if (response.status == 200) {
         const domainResponse: any = await response.text();
-        domain = JSON.parse(domainResponse).data.domainName;
+        const domainJson = JSON.parse(domainResponse)
+        domain = domainJson.data? domainJson.data.domainName: domainJson.domainName;
         console.log("Domain",domain)
       }
     } catch (error) {
@@ -198,6 +198,7 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
     colonyTickers: motionInfo.associatedColony.token.symbol,
     transactionId: formatAddress(TsxId),
     requiredStake: motionInfo.requiredStake,
+    tsxId: motionInfo.transaction.id
   };
   return motionData;
 }
@@ -210,6 +211,7 @@ interface colonyMotionData {
   colonyTickers: string;
   transactionId: string;
   requiredStake: string;
+  tsxId: string,
 }
 
 function formatAddress(address: string, size = 4) {
