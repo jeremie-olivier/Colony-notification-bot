@@ -132,11 +132,8 @@ function getEmbed(p: colonyPaymentData, config: any) {
       iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
-   
-    
     .setTimestamp()
-    .setFooter({ text: `Tsx : ${p.transactionId}`}); 
-
+    .setFooter({ text: ' '}); 
   return embed;
 }
 function getDiscordMessage(embed: any, p: colonyPaymentData) {

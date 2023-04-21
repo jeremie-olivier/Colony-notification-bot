@@ -96,7 +96,9 @@ function getEmbed(p: colonyMotionData, config: any) {
       name: `${p.colonyName}`,
       iconURL: `${config.url}`,
     })
-    .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" });
+    .addFields({ value: `In **${p.motionDomain}** team.`, name: "\u200B" })
+    .setTimestamp()
+    .setFooter({ text: ' '}); 
   return embed;
 }
 
