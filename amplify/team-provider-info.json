@@ -1,0 +1,15 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colonynotifications-staging-134414-authRole",
+      "UnauthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-staging-134414-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-staging-134414-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-colonynotifications-staging-134414-deployment",
+      "UnauthRoleName": "amplify-colonynotifications-staging-134414-unauthRole",
+      "StackName": "amplify-colonynotifications-staging-134414",
+      "StackId": "arn:aws:cloudformation:eu-west-3:208457094315:stack/amplify-colonynotifications-staging-134414/19f37eb0-e2a6-11ed-a717-06dd3f696f9c",
+      "AmplifyAppId": "d2g3qlkg47j2yi"
+    }
+  }
+}

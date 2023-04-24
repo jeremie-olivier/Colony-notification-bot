@@ -1,0 +1,78 @@
+enum EventType {
+  PAYMENT
+  SIMPLE_DECISION
+  TOKEN_MINT
+}
+
+type DiscordChannel @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  notificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byDiscordChannel", fields: ["id"])
+  discordServer: ID! @index(name: "byDiscordServer")
+  discordId: String
+  name: String
+}
+
+type Colony @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  notifyInDiscordServers: [DiscordServer] @manyToMany(relationName: "ColonyDiscordServer")
+  notificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byColony", fields: ["id"])
+  name: String
+  domains: [Domain] @hasMany(indexName: "byColony", fields: ["id"])
+}
+
+type Mention @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  discordRoleId: String
+  notificationSubscription: ID! @index(name: "byNotificationSubscription")
+  user: ID! @index(name: "byUser")
+}
+
+type NotificationSubscription @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  discordChannel: ID! @index(name: "byDiscordChannel")
+  colony: ID! @index(name: "byColony")
+  author: ID! @index(name: "byUser")
+  domain: ID! @index(name: "byDomain")
+  colonyEventType: ID! @index(name: "byColonyEventType")
+  hits: [Hit] @hasMany(indexName: "byNotificationSubscription", fields: ["id"])
+  mentions: [Mention] @hasMany(indexName: "byNotificationSubscription", fields: ["id"])
+}
+
+type DiscordServer @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  hasColonyNotificationBotAdded: Boolean
+  managedByUsers: [User] @manyToMany(relationName: "UserDiscordServer")
+  colonies: [Colony] @manyToMany(relationName: "ColonyDiscordServer")
+  channels: [DiscordChannel] @hasMany(indexName: "byDiscordServer", fields: ["id"])
+  discordId: String
+  name: String
+}
+
+type Hit @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  discordMessageLink: AWSURL
+  notificationSubscription: ID! @index(name: "byNotificationSubscription")
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  authorOfNotificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byUser", fields: ["id"])
+  mentions: [Mention] @hasMany(indexName: "byUser", fields: ["id"])
+  discordId: String
+  walletAddress: String
+  managerOfDiscords: [DiscordServer] @manyToMany(relationName: "UserDiscordServer")
+}
+
+type ColonyEventType @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  notificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byColonyEventType", fields: ["id"])
+  type: EventType
+}
+
+type Domain @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  notificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byDomain", fields: ["id"])
+  name: String
+  colony: ID! @index(name: "byColony")
+}
+ 
