@@ -172,18 +172,19 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
   //console.log("motiofdfdsfsdfdsn",motionInfo)
   const domainMeta = motionInfo.domain.metadata;
     let domain = motionInfo.domain.name;
-    console.log("domainMeta",domainMeta)
+
   if (domainMeta) {
     try {
       const response = await fetch(
         `https://gateway.pinata.cloud/ipfs/${domainMeta}`
       );
-      console.log(response)
+
       if (response.status == 200) {
         const domainResponse: any = await response.text();
+        
         const domainJson = JSON.parse(domainResponse)
         domain = domainJson.data? domainJson.data.domainName: domainJson.domainName;
-        console.log("Domain",domain)
+
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);

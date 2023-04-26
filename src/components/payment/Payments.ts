@@ -197,22 +197,22 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
 
   const domainMeta = paymentInfo.domain.metadata;
   let domain = paymentInfo.domain.name;
-  //console.log("domainMeta",domainMeta)
+
   if (domainMeta) {
     
     try {
       const response = await fetch(
         `https://gateway.pinata.cloud/ipfs/${domainMeta}`
       );
-      //console.log(response)
+ 
       if (response.status == 200) {
         const domainResponse: any = await response.text();
-        
-        domain = JSON.parse(domainResponse).data.domainName;
-        //console.log("Domain",domain)
+        const domainJson = JSON.parse(domainResponse)
+        domain.data.domainName ? domainJson.data.domainName: domainJson.domainName
+     
       }
     } catch (error) {
-      //console.error(`Error fetching IPFS domain: ${error}`);
+    
     }
   }
 
