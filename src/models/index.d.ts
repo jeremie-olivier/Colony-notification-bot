@@ -18,7 +18,7 @@ type EagerDiscordChannel = {
   readonly id: string;
   readonly notificationSubscriptions?: (NotificationSubscription | null)[] | null;
   readonly discordServer: string;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -32,7 +32,7 @@ type LazyDiscordChannel = {
   readonly id: string;
   readonly notificationSubscriptions: AsyncCollection<NotificationSubscription>;
   readonly discordServer: string;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -54,6 +54,7 @@ type EagerColony = {
   readonly notificationSubscriptions?: (NotificationSubscription | null)[] | null;
   readonly name?: string | null;
   readonly domains?: (Domain | null)[] | null;
+  readonly url?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -68,6 +69,7 @@ type LazyColony = {
   readonly notificationSubscriptions: AsyncCollection<NotificationSubscription>;
   readonly name?: string | null;
   readonly domains: AsyncCollection<Domain>;
+  readonly url?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -84,7 +86,7 @@ type EagerMention = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly discordRoleId?: string | null;
+  readonly idDiscordRole?: string | null;
   readonly notificationSubscription: string;
   readonly user: string;
   readonly createdAt?: string | null;
@@ -97,7 +99,7 @@ type LazyMention = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly discordRoleId?: string | null;
+  readonly idDiscordRole?: string | null;
   readonly notificationSubscription: string;
   readonly user: string;
   readonly createdAt?: string | null;
@@ -116,11 +118,15 @@ type EagerNotificationSubscription = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly discordChannel: string;
-  readonly colony: string;
+  readonly colony?: Colony | null;
+  readonly domain?: Domain | null;
+  readonly discordChannel?: DiscordChannel | null;
+  readonly colonyEventType?: ColonyEventType | null;
+  readonly colonyId: string;
+  readonly domainId: string;
+  readonly discordChannelId: string;
+  readonly colonyEventTypeId: string;
   readonly author: string;
-  readonly domain: string;
-  readonly colonyEventType: string;
   readonly hits?: (Hit | null)[] | null;
   readonly mentions?: (Mention | null)[] | null;
   readonly createdAt?: string | null;
@@ -133,11 +139,15 @@ type LazyNotificationSubscription = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly discordChannel: string;
-  readonly colony: string;
+  readonly colony: AsyncItem<Colony | undefined>;
+  readonly domain: AsyncItem<Domain | undefined>;
+  readonly discordChannel: AsyncItem<DiscordChannel | undefined>;
+  readonly colonyEventType: AsyncItem<ColonyEventType | undefined>;
+  readonly colonyId: string;
+  readonly domainId: string;
+  readonly discordChannelId: string;
+  readonly colonyEventTypeId: string;
   readonly author: string;
-  readonly domain: string;
-  readonly colonyEventType: string;
   readonly hits: AsyncCollection<Hit>;
   readonly mentions: AsyncCollection<Mention>;
   readonly createdAt?: string | null;
@@ -160,7 +170,7 @@ type EagerDiscordServer = {
   readonly managedByUsers?: (UserDiscordServer | null)[] | null;
   readonly colonies?: (ColonyDiscordServer | null)[] | null;
   readonly channels?: (DiscordChannel | null)[] | null;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -176,7 +186,7 @@ type LazyDiscordServer = {
   readonly managedByUsers: AsyncCollection<UserDiscordServer>;
   readonly colonies: AsyncCollection<ColonyDiscordServer>;
   readonly channels: AsyncCollection<DiscordChannel>;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -226,7 +236,7 @@ type EagerUser = {
   readonly id: string;
   readonly authorOfNotificationSubscriptions?: (NotificationSubscription | null)[] | null;
   readonly mentions?: (Mention | null)[] | null;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly walletAddress?: string | null;
   readonly managerOfDiscords?: (UserDiscordServer | null)[] | null;
   readonly createdAt?: string | null;
@@ -241,7 +251,7 @@ type LazyUser = {
   readonly id: string;
   readonly authorOfNotificationSubscriptions: AsyncCollection<NotificationSubscription>;
   readonly mentions: AsyncCollection<Mention>;
-  readonly discordId?: string | null;
+  readonly idDiscord?: string | null;
   readonly walletAddress?: string | null;
   readonly managerOfDiscords: AsyncCollection<UserDiscordServer>;
   readonly createdAt?: string | null;

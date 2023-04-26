@@ -33,8 +33,8 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "discordId": {
-                    "name": "discordId",
+                "idDiscord": {
+                    "name": "idDiscord",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -163,6 +163,13 @@ export const schema = {
                         ]
                     }
                 },
+                "url": {
+                    "name": "url",
+                    "isArray": false,
+                    "type": "AWSURL",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -185,6 +192,10 @@ export const schema = {
             "attributes": [
                 {
                     "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "searchable",
                     "properties": {}
                 },
                 {
@@ -215,8 +226,8 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "discordRoleId": {
-                    "name": "discordRoleId",
+                "idDiscordRole": {
+                    "name": "idDiscordRole",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -306,15 +317,89 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "colony": {
+                    "name": "colony",
+                    "isArray": false,
+                    "type": {
+                        "model": "Colony"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "colonyId"
+                        ]
+                    }
+                },
+                "domain": {
+                    "name": "domain",
+                    "isArray": false,
+                    "type": {
+                        "model": "Domain"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "domainId"
+                        ]
+                    }
+                },
                 "discordChannel": {
                     "name": "discordChannel",
+                    "isArray": false,
+                    "type": {
+                        "model": "DiscordChannel"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "discordChannelId"
+                        ]
+                    }
+                },
+                "colonyEventType": {
+                    "name": "colonyEventType",
+                    "isArray": false,
+                    "type": {
+                        "model": "ColonyEventType"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "colonyEventTypeId"
+                        ]
+                    }
+                },
+                "colonyId": {
+                    "name": "colonyId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
                     "attributes": []
                 },
-                "colony": {
-                    "name": "colony",
+                "domainId": {
+                    "name": "domainId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "discordChannelId": {
+                    "name": "discordChannelId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "colonyEventTypeId": {
+                    "name": "colonyEventTypeId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
@@ -322,20 +407,6 @@ export const schema = {
                 },
                 "author": {
                     "name": "author",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "domain": {
-                    "name": "domain",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "colonyEventType": {
-                    "name": "colonyEventType",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
@@ -400,18 +471,36 @@ export const schema = {
                 {
                     "type": "key",
                     "properties": {
-                        "name": "byDiscordChannel",
+                        "name": "byColonySubscription",
                         "fields": [
-                            "discordChannel"
+                            "colonyId"
                         ]
                     }
                 },
                 {
                     "type": "key",
                     "properties": {
-                        "name": "byColony",
+                        "name": "byDomainSubscription",
                         "fields": [
-                            "colony"
+                            "domainId"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byDiscordChannelSubscription",
+                        "fields": [
+                            "discordChannelId"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byColonyEventTypeSubscription",
+                        "fields": [
+                            "colonyEventTypeId"
                         ]
                     }
                 },
@@ -421,24 +510,6 @@ export const schema = {
                         "name": "byUser",
                         "fields": [
                             "author"
-                        ]
-                    }
-                },
-                {
-                    "type": "key",
-                    "properties": {
-                        "name": "byDomain",
-                        "fields": [
-                            "domain"
-                        ]
-                    }
-                },
-                {
-                    "type": "key",
-                    "properties": {
-                        "name": "byColonyEventType",
-                        "fields": [
-                            "colonyEventType"
                         ]
                     }
                 },
@@ -525,8 +596,8 @@ export const schema = {
                         ]
                     }
                 },
-                "discordId": {
-                    "name": "discordId",
+                "idDiscord": {
+                    "name": "idDiscord",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -698,8 +769,8 @@ export const schema = {
                         ]
                     }
                 },
-                "discordId": {
-                    "name": "discordId",
+                "idDiscord": {
+                    "name": "idDiscord",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -1147,5 +1218,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.0",
-    "version": "4d705ec966837e4ced09815ea02f3c0d"
+    "version": "94120a98173618ff8d189a0f03aa8d9e"
 };

@@ -1,4 +1,22 @@
 {
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colonynotifications-dev-144501-authRole",
+      "UnauthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-dev-144501-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-dev-144501-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-colonynotifications-dev-144501-deployment",
+      "UnauthRoleName": "amplify-colonynotifications-dev-144501-unauthRole",
+      "StackName": "amplify-colonynotifications-dev-144501",
+      "StackId": "arn:aws:cloudformation:eu-west-3:208457094315:stack/amplify-colonynotifications-dev-144501/c278bf60-e377-11ed-a15a-068773357d1e",
+      "AmplifyAppId": "d2g3qlkg47j2yi"
+    },
+    "categories": {
+      "api": {
+        "ColonyNotifications": {}
+      }
+    }
+  },
   "staging": {
     "awscloudformation": {
       "AuthRoleName": "amplify-colonynotifications-staging-134414-authRole",
@@ -10,6 +28,29 @@
       "StackName": "amplify-colonynotifications-staging-134414",
       "StackId": "arn:aws:cloudformation:eu-west-3:208457094315:stack/amplify-colonynotifications-staging-134414/19f37eb0-e2a6-11ed-a717-06dd3f696f9c",
       "AmplifyAppId": "d2g3qlkg47j2yi"
+    },
+    "categories": {
+      "api": {
+        "ColonyNotifications": {}
+      }
+    }
+  },
+  "test": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colonynotifications-test-111651-authRole",
+      "UnauthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-test-111651-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-test-111651-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-colonynotifications-test-111651-deployment",
+      "UnauthRoleName": "amplify-colonynotifications-test-111651-unauthRole",
+      "StackName": "amplify-colonynotifications-test-111651",
+      "StackId": "arn:aws:cloudformation:eu-west-3:208457094315:stack/amplify-colonynotifications-test-111651/15ab8ff0-e413-11ed-bf2b-0ee9d0c7b426",
+      "AmplifyAppId": "d2g3qlkg47j2yi"
+    },
+    "categories": {
+      "api": {
+        "ColonyNotifications": {}
+      }
     }
   }
 }
