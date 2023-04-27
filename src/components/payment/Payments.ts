@@ -7,7 +7,7 @@ import { providers } from "ethers";
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
-import { walletToDiscord } from "../utility/WalletToDiscord";
+import { walletToDiscord } from "../../utility/WalletToDiscord";
 
 dotenv.config();
 

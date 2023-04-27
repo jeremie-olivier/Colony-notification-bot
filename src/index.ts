@@ -2,6 +2,10 @@ const Discord = require("discord.js");
 import { runPayment } from "./components/payment/Payments";
 import { runMotion } from "./components/motion/Motion";
 
+import { Amplify } from "aws-amplify";
+import awsconfig from "./aws-exports";
+Amplify.configure(awsconfig);
+
 import * as dotenv from "dotenv";
 import { ServerConfig } from "./ServerConfig";
 dotenv.config();
