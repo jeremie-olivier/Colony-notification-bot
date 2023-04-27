@@ -7,6 +7,7 @@ import { providers } from "ethers";
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
+import { walletToDiscord } from "../utility/WalletToDiscord";
 
 dotenv.config();
 
@@ -40,12 +41,16 @@ async function createAndSendMessage(
   let colonyPaymentData = await parsePaymentData(result);
 
   if (colonyPaymentData.transactionId != lastTransaction) {
-    const embed = getEmbed(colonyPaymentData, config, result.transaction.block.timestamp);
+    const embed = getEmbed(
+      colonyPaymentData,
+      config,
+      result.transaction.block.timestamp
+    );
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
 
-    //console.log("config",config)
-    if (colonyPaymentData.colonyName != config.colony) return;
+    // if (colonyPaymentData.colonyName != config.colony) return;
+
     // @ts-ignore
     if (!config.forcedPayment) return;
     const channel = getDiscordChannel(discordClient, config.forcedPayment);
@@ -135,12 +140,16 @@ function getEmbed(p: colonyPaymentData, config: any, timestamp: number) {
       iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
-    .setFooter({ text: `Tsx : ${p.transactionId} - ${new Date(timestamp*1000).toUTCString()}` });
+    .setFooter({
+      text: `Tsx : ${p.transactionId} - ${new Date(
+        timestamp * 1000
+      ).toUTCString()}`,
+    });
   return embed;
 }
 function getDiscordMessage(embed: any, p: colonyPaymentData) {
   const message = {
-    // content: "@business",
+    content: p.mentions,
     tts: false,
     components: [
       {
@@ -198,22 +207,22 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const domainMeta = paymentInfo.domain.metadata;
   let domain = paymentInfo.domain.name;
 
+  let mentions = await getMentions(recipient);
+
   if (domainMeta) {
-    
     try {
       const response = await fetch(
         `https://gateway.pinata.cloud/ipfs/${domainMeta}`
       );
- 
+
       if (response.status == 200) {
         const domainResponse: any = await response.text();
-        const domainJson = JSON.parse(domainResponse)
-        domain.data.domainName ? domainJson.data.domainName: domainJson.domainName
-     
+        const domainJson = JSON.parse(domainResponse);
+        domain.data.domainName
+          ? domainJson.data.domainName
+          : domainJson.domainName;
       }
-    } catch (error) {
-    
-    }
+    } catch (error) {}
   }
 
   let paymentData: colonyPaymentData = {
@@ -223,6 +232,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     recipientUsername,
     colonyAdress: paymentInfo.domain.colonyAddress,
     recipient: formatAddress(recipient),
+    mentions,
     amountPayed,
     transactionId: formatAddress(TsxId),
     tsxId: data.transaction.id,
@@ -238,12 +248,18 @@ interface colonyPaymentData {
   colonyAdress: string;
   recipient: string;
   amountPayed: number;
+  mentions: string;
   transactionId: string;
-  tsxId: string,
+  tsxId: string;
 }
 
 function formatAddress(address: string, size = 4) {
   var first = address.slice(0, size + 1);
   var last = address.slice(-size);
   return first + "..." + last;
+}
+
+async function getMentions(recipientAddress: string) {
+  let dicordId = await walletToDiscord(recipientAddress);
+  return dicordId ? `<@${dicordId}>` : "";
 }
