@@ -5,7 +5,7 @@ import * as queries from "../graphql/queries";
 
 export async function getNotificationSubscription(colonyName: string) {
   // Fetch a single record by its identifier
-  console.log(getNotificationSubscription)
+
   const response = await API.graphql<GraphQLQuery<any>>({
     query: `query Query($filter: ModelColonyFilterInput) {
         listColonies(filter: $filter) {

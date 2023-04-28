@@ -42,8 +42,7 @@ async function createAndSendMessage(
     );
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
-    console.log(colonyMotionData);
-    console.log(config);
+  
 
     if (colonyMotionData.colonyName != config.colony) return;
     // @ts-ignore
@@ -169,7 +168,7 @@ function getDiscordChannel(discordClient: any, channelId: string) {
 async function parseMotionData(data: any): Promise<colonyMotionData> {
   const motionInfo = data;
   const TsxId: string = motionInfo.transaction.id;
-  //console.log("motiofdfdsfsdfdsn",motionInfo)
+
   const domainMeta = motionInfo.domain.metadata;
     let domain = motionInfo.domain.name;
 
