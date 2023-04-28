@@ -41,6 +41,7 @@ async function createAndSendMessage(
   result: any
 ): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
+  console.log("HELLO MAIS MOI JE SUIS AVANT", colonyPaymentData);
   //@ts-ignore
   let notifsSubs = await notificationsSubs(colonyPaymentData.colonyName);
   //let conlonyAvatarUrl = await getColonyAvatarImage(parseData.colony)
@@ -52,7 +53,8 @@ console.log("HELLO JE SUIS ICI", notifsSubs);
     );
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
-    //@ts-ignore
+    debugger
+    //@ts-ignore 
     notifsSubs.filter((sub: { domain: any; }) => colonyPaymentData.domain == sub.domain).forEach(async (sub: { idDiscord: any; }) => {
       const channel = getDiscordChannel(discordClient, sub.idDiscord);
       await channel.send(message);
@@ -189,7 +191,7 @@ function getDiscordChannel(
 
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
-  //console.log("payment info", paymentInfo)
+  console.log("payment info", paymentInfo)
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
   const decimals = Math.pow(10, fundPot.token.decimals);
   const fundingAmount = fundPot.amount / decimals;
@@ -220,7 +222,8 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
       if (response.status == 200) {
         const domainResponse: any = await response.text();
         const domainJson = JSON.parse(domainResponse);
-        domain.data.domainName
+        console.log("DOMAIN JSON", domainJson);
+        domain = domainJson.data
           ? domainJson.data.domainName
           : domainJson.domainName;
       }
