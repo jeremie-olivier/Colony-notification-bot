@@ -8,6 +8,8 @@ import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
 import { walletToDiscord } from "../../utility/WalletToDiscord";
+import { notificationsSubs } from "../../utility/NotificationToDiscord";
+//import { getColonyAvatarImage } from "@colony/colony-event-metadata-parser/*";
 
 dotenv.config();
 
@@ -39,22 +41,22 @@ async function createAndSendMessage(
   result: any
 ): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
-
+  //@ts-ignore
+  let notifsSubs = await notificationsSubs(colonyPaymentData.colonyName);
+  //let conlonyAvatarUrl = await getColonyAvatarImage(parseData.colony)
+console.log("HELLO JE SUIS ICI", notifsSubs);
   if (colonyPaymentData.transactionId != lastTransaction) {
     const embed = getEmbed(
       colonyPaymentData,
-      config,
       result.transaction.block.timestamp
     );
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
-
-    // if (colonyPaymentData.colonyName != config.colony) return;
-
-    // @ts-ignore
-    if (!config.forcedPayment) return;
-    const channel = getDiscordChannel(discordClient, config.forcedPayment);
-    await channel.send(message);
+    //@ts-ignore
+    notifsSubs.filter((sub: { domain: any; }) => colonyPaymentData.domain == sub.domain).forEach(async (sub: { idDiscord: any; }) => {
+      const channel = getDiscordChannel(discordClient, sub.idDiscord);
+      await channel.send(message);
+    })
   }
 }
 
@@ -125,7 +127,7 @@ function getGqlVariables(): any {
   return VARIABLES;
 }
 
-function getEmbed(p: colonyPaymentData, config: any, timestamp: number) {
+function getEmbed(p: colonyPaymentData, timestamp: number) {
   const embed = new EmbedBuilder()
     .setColor(0x1cae9f)
     .setTitle("New Payment")
@@ -137,7 +139,7 @@ function getEmbed(p: colonyPaymentData, config: any, timestamp: number) {
     )
     .setAuthor({
       name: `${p.colonyName}`,
-      iconURL: `${config.url}`,
+      //iconURL: `${config.url}`, TEST WITH getColonyAvatarImage (ColonySDK) ----
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
     .setFooter({
