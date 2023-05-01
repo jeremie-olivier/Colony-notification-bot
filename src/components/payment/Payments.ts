@@ -2,17 +2,18 @@ import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { ColonyNetwork, ColonyRpcEndpoint } from "@colony/sdk";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
-import { ethers } from "ethers";
+
 import { providers } from "ethers";
-import * as dotenv from "dotenv";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
-import { DocumentNode } from "graphql";
+
+// Utilities
 import { walletToDiscord } from "../../utility/WalletToDiscord";
 import { notificationsSubs } from "../../utility/NotificationToDiscord";
-import { getColonyAvatarImage } from "@colony/colony-event-metadata-parser";
+import { getColonyAvatarFile } from "../../utility/colonyAvatar";
+import { formatAddress } from "../../utility/formatAddress";
 
+import { ColonyPaymentData } from "../../types/colonyPaymentData";
 
-
+import * as dotenv from "dotenv";
 dotenv.config();
 
 export async function runPayment(discordClient: any): Promise<any> {
@@ -21,13 +22,8 @@ export async function runPayment(discordClient: any): Promise<any> {
   const subscription = getGqlSubscription(GQL, GQLVARIABLES);
   pipe(
     subscription,
-    subscribe((r) =>
-      createAndSendMessage(
-        discordClient,
-
-        // @ts-ignore
-        r.data.oneTxPayments[0]
-      )
+    subscribe((r: any) =>
+      createAndSendMessage(discordClient, r.data.oneTxPayments[0])
     )
   );
 }
@@ -40,41 +36,31 @@ async function createAndSendMessage(
 ): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
 
-  //@ts-ignore
+  if (colonyPaymentData.transactionId == lastTransaction) return;
+
   let notifsSubs: any = await notificationsSubs(colonyPaymentData.colonyName);
-  let colonyAvatarUrl = await getColonyAvatarImage(colonyPaymentData.colonyName)
-
-
-
-  if (colonyPaymentData.transactionId != lastTransaction) {
-    const embed = getEmbed(
-      colonyPaymentData,
-      result.transaction.block.timestamp
-    );
-    const message = getDiscordMessage(embed, colonyPaymentData);
-    lastTransaction = colonyPaymentData.transactionId;
-
-    //@ts-ignore
-    notifsSubs
-      .filter(
-        (sub: { domain: any }) =>
-          colonyPaymentData.domain == sub.domain.name ||
-          sub.domain.name.toUpperCase() == "ALL"
-      )
-      .forEach(async (sub: any) => {
-        const channel = getDiscordChannel(
-          discordClient,
-          sub.discordChannel.idDiscord
-        );
-        await channel.send(message);
-      });
-  }
+  notifsSubs
+    .filter(
+      (sub: { domain: any }) =>
+        colonyPaymentData.domain == sub.domain.name ||
+        sub.domain.name.toUpperCase() == "ALL"
+    )
+    .forEach(async (sub: any) => {
+      const channel = getDiscordChannel(
+        discordClient,
+        sub.discordChannel.idDiscord
+      );
+      const embed = getEmbed(
+        colonyPaymentData,
+        result.transaction.block.timestamp
+      );
+      const message = await getDiscordMessage(embed, colonyPaymentData);
+      await channel.send(message);
+      lastTransaction = colonyPaymentData.transactionId;
+    });
 }
 
-function getGqlSubscription(
-  gql: string | DocumentNode | TypedDocumentNode<any, any>,
-  variables: any
-): any {
+function getGqlSubscription(gql: string, variables: any): any {
   const colonySubgraph = createSubgraphClient();
   const subscription = colonySubgraph.subscription(gql, variables);
   return subscription;
@@ -95,6 +81,7 @@ function getGQLrequest(): any {
         nPayouts
         payment {
           colony {
+            metadata
             ensName
             id
             token {
@@ -138,7 +125,7 @@ function getGqlVariables(): any {
   return VARIABLES;
 }
 
-function getEmbed(p: colonyPaymentData, timestamp: number) {
+function getEmbed(p: ColonyPaymentData, timestamp: number) {
   const embed = new EmbedBuilder()
     .setColor(0x1cae9f)
     .setTitle("New Payment")
@@ -150,7 +137,7 @@ function getEmbed(p: colonyPaymentData, timestamp: number) {
     )
     .setAuthor({
       name: `${p.colonyName}`,
-      //iconURL: `${config.url}`, TEST WITH getColonyAvatarImage (ColonySDK) ----
+      iconURL: "attachment://colony-avatar.png",
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
     .setFooter({
@@ -158,9 +145,12 @@ function getEmbed(p: colonyPaymentData, timestamp: number) {
         timestamp * 1000
       ).toUTCString()}`,
     });
+
   return embed;
 }
-function getDiscordMessage(embed: any, p: colonyPaymentData) {
+async function getDiscordMessage(embed: any, p: ColonyPaymentData) {
+  let file = await getColonyAvatarFile(p.colonyMetaData);
+
   const message = {
     content: p.mentions,
     tts: false,
@@ -186,19 +176,17 @@ function getDiscordMessage(embed: any, p: colonyPaymentData) {
       },
     ],
     embeds: [embed],
+    files: [file],
   };
   return message;
 }
 
-function getDiscordChannel(
-  discordCient: { channels: { cache: { get: (arg0: string) => any } } },
-  channelId: string
-) {
+function getDiscordChannel(discordCient: any, channelId: string) {
   const channel = discordCient.channels.cache.get(channelId);
   return channel;
 }
 
-async function parsePaymentData(data: any): Promise<colonyPaymentData> {
+async function parsePaymentData(data: any): Promise<ColonyPaymentData> {
   const paymentInfo = data.payment;
 
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
@@ -207,10 +195,6 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const amountPayed = Math.floor((fundingAmount * 100) / 100);
 
   const provider = new providers.JsonRpcProvider(ColonyRpcEndpoint.Gnosis);
-  const signer = new ethers.Wallet(
-    "55f32b12ca4ee3ce5157d40f42a8cb0171aa37e39600e2a906aca01e966275bc",
-    provider
-  );
 
   const TsxId: string = data.transaction.id;
   const recipient: string = paymentInfo.to;
@@ -239,8 +223,9 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     } catch (error) {}
   }
 
-  let paymentData: colonyPaymentData = {
+  let paymentData: ColonyPaymentData = {
     colonyName: paymentInfo.colony.ensName.split(".")[0],
+    colonyMetaData: paymentInfo.colony.metadata,
     colonyTickers: paymentInfo.fundingPot.fundingPotPayouts[0].token.symbol,
     domain,
     recipientUsername,
@@ -252,25 +237,6 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
     tsxId: data.transaction.id,
   };
   return paymentData;
-}
-
-interface colonyPaymentData {
-  colonyName: string;
-  colonyTickers: string;
-  domain: string;
-  recipientUsername: string | null;
-  colonyAdress: string;
-  recipient: string;
-  amountPayed: number;
-  mentions: string;
-  transactionId: string;
-  tsxId: string;
-}
-
-function formatAddress(address: string, size = 4) {
-  var first = address.slice(0, size + 1);
-  var last = address.slice(-size);
-  return first + "..." + last;
 }
 
 async function getMentions(recipientAddress: string) {

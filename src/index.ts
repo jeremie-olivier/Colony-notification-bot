@@ -24,6 +24,5 @@ client.once("ready", listenToColonyEvent);
 
 function listenToColonyEvent(): void {
   runPayment(client);
-  runMotion(client)
-
+  runMotion(client);
 }

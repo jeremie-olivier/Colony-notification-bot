@@ -2,11 +2,15 @@ import { createSubgraphClient, gql } from "@colony/sdk/graph";
 import { pipe, subscribe } from "wonka";
 const { EmbedBuilder } = require("discord.js");
 const Discord = require("discord.js");
-import * as dotenv from "dotenv";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
-import { DocumentNode } from "graphql";
-import { notificationsSubs } from "../../utility/NotificationToDiscord";
 
+// Utilities
+import { notificationsSubs } from "../../utility/NotificationToDiscord";
+import { formatAddress } from "../../utility/formatAddress";
+
+import { ColonyMotionData } from "../../types/colonyMotionData";
+
+import * as dotenv from "dotenv";
+import { getColonyAvatarFile } from "../../utility/colonyAvatar";
 dotenv.config();
 
 export async function runMotion(discordClient: any): Promise<any> {
@@ -15,13 +19,8 @@ export async function runMotion(discordClient: any): Promise<any> {
   const subscription = getGqlSubscription(GQL, GQLVARIABLES);
   pipe(
     subscription,
-    subscribe((r) =>
-      createAndSendMessage(
-        discordClient,
-
-        // @ts-ignore
-        r.data.motions[0]
-      )
+    subscribe((r: any) =>
+      createAndSendMessage(discordClient, r.data.motions[0])
     )
   );
 }
@@ -30,35 +29,29 @@ let lastMotion: string;
 
 async function createAndSendMessage(
   discordClient: any,
-
   result: any
 ): Promise<void> {
   let colonyMotionData = await parseMotionData(result);
 
+  if (colonyMotionData.transactionId != lastMotion) return;
+
   let notifsSubs: any = await notificationsSubs(colonyMotionData.colonyName);
-
-  if (colonyMotionData.transactionId != lastMotion) {
-    const embed = getEmbed(
-      colonyMotionData,
-      result.transaction.block.timestamp
-    );
-    const message = getDiscordMessage(embed, colonyMotionData);
-    lastMotion = colonyMotionData.transactionId;
-
-    notifsSubs
-      .filter(
-        (sub: { domain: any }) =>
-          colonyMotionData.domain == sub.domain.name ||
-          sub.domain.name.toUpperCase() == "ALL"
-      )
-      .forEach(async (sub: any) => {
-        const channel = getDiscordChannel(
-          discordClient,
-          sub.discordChannel.idDiscord
-        );
-        await channel.send(message);
-      });
-  }
+  notifsSubs
+    .filter(
+      (sub: { domain: any }) =>
+        colonyMotionData.domain == sub.domain.name ||
+        sub.domain.name.toUpperCase() == "ALL"
+    )
+    .forEach(async (sub: any) => {
+      const embed = getEmbed(colonyMotionData);
+      const message = getDiscordMessage(embed, colonyMotionData);
+      const channel = getDiscordChannel(
+        discordClient,
+        sub.discordChannel.idDiscord
+      );
+      await channel.send(message);
+      lastMotion = colonyMotionData.transactionId;
+    });
 }
 
 function getGQLrequest(): any {
@@ -107,16 +100,13 @@ function getGqlVariables(): any {
   return VARIABLES;
 }
 
-function getGqlSubscription(
-  gql: string | DocumentNode | TypedDocumentNode<any, any>,
-  variables: any
-): any {
+function getGqlSubscription(gql: string, variables: any): any {
   const colonySubgraph = createSubgraphClient();
   const subscription = colonySubgraph.subscription(gql, variables);
   return subscription;
 }
 
-function getEmbed(p: colonyMotionData, timestamp: number) {
+function getEmbed(p: ColonyMotionData) {
   const embed = new EmbedBuilder()
     .setColor(0xf7c325)
     .setTitle("New Motion Event")
@@ -126,18 +116,20 @@ function getEmbed(p: colonyMotionData, timestamp: number) {
     )
     .setAuthor({
       name: `${p.colonyName}`,
-      //iconURL: `${config.url}`,
+      iconURL: "attachment://colony-avatar.png",
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
     .setFooter({
       text: `Tsx : ${p.transactionId} - ${new Date(
-        timestamp * 1000
+        p.timestamp * 1000
       ).toUTCString()}`,
     });
   return embed;
 }
 
-function getDiscordMessage(embed: any, p: colonyMotionData) {
+async function getDiscordMessage(embed: any, p: ColonyMotionData) {
+  let file = await getColonyAvatarFile(p.colonyMetaData);
+
   const message = {
     // content: "@business a new payment request has been made and is pending staking\n 0/100 CHR Staked",
     tts: false,
@@ -163,6 +155,7 @@ function getDiscordMessage(embed: any, p: colonyMotionData) {
       },
     ],
     embeds: [embed],
+    files: [file],
   };
   return message;
 }
@@ -172,7 +165,7 @@ function getDiscordChannel(discordClient: any, channelId: string) {
   return channel;
 }
 
-async function parseMotionData(data: any): Promise<colonyMotionData> {
+async function parseMotionData(data: any): Promise<ColonyMotionData> {
   const motionInfo = data;
   const TsxId: string = motionInfo.transaction.id;
 
@@ -198,32 +191,17 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
     }
   }
 
-  let motionData: colonyMotionData = {
+  let motionData: ColonyMotionData = {
     motionStake: motionInfo.stakes,
     motionDomain: motionInfo.domain.name,
     domain,
     colonyName: motionInfo.associatedColony.ensName.split(".")[0],
     colonyTickers: motionInfo.associatedColony.token.symbol,
+    colonyMetaData: motionInfo.associatedColony.metadata,
+    timestamp: motionInfo.transaction.block.timestamp,
     transactionId: formatAddress(TsxId),
     requiredStake: motionInfo.requiredStake,
     tsxId: motionInfo.transaction.id,
   };
   return motionData;
-}
-
-interface colonyMotionData {
-  motionStake: string;
-  motionDomain: string;
-  domain: string;
-  colonyName: string;
-  colonyTickers: string;
-  transactionId: string;
-  requiredStake: string;
-  tsxId: string;
-}
-
-function formatAddress(address: string, size = 4) {
-  var first = address.slice(0, size + 1);
-  var last = address.slice(-size);
-  return first + "..." + last;
 }
