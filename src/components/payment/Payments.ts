@@ -9,14 +9,13 @@ import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
 import { walletToDiscord } from "../../utility/WalletToDiscord";
 import { notificationsSubs } from "../../utility/NotificationToDiscord";
-//import { getColonyAvatarImage } from "@colony/colony-event-metadata-parser/*";
+import { getColonyAvatarImage } from "@colony/colony-event-metadata-parser";
+
+
 
 dotenv.config();
 
-export async function runPayment(
-  discordClient: any,
-  config: any
-): Promise<any> {
+export async function runPayment(discordClient: any): Promise<any> {
   const GQL = getGQLrequest();
   const GQLVARIABLES = getGqlVariables();
   const subscription = getGqlSubscription(GQL, GQLVARIABLES);
@@ -25,7 +24,7 @@ export async function runPayment(
     subscribe((r) =>
       createAndSendMessage(
         discordClient,
-        config,
+
         // @ts-ignore
         r.data.oneTxPayments[0]
       )
@@ -37,14 +36,15 @@ let lastTransaction: string;
 
 async function createAndSendMessage(
   discordClient: any,
-  config: any,
   result: any
 ): Promise<void> {
   let colonyPaymentData = await parsePaymentData(result);
- 
+
   //@ts-ignore
-  let notifsSubs = await notificationsSubs(colonyPaymentData.colonyName);
-  //let conlonyAvatarUrl = await getColonyAvatarImage(parseData.colony)
+  let notifsSubs: any = await notificationsSubs(colonyPaymentData.colonyName);
+  let colonyAvatarUrl = await getColonyAvatarImage(colonyPaymentData.colonyName)
+
+
 
   if (colonyPaymentData.transactionId != lastTransaction) {
     const embed = getEmbed(
@@ -53,13 +53,21 @@ async function createAndSendMessage(
     );
     const message = getDiscordMessage(embed, colonyPaymentData);
     lastTransaction = colonyPaymentData.transactionId;
-   
-    //@ts-ignore 
-    notifsSubs.filter(
-      (sub: { domain: any; }) => colonyPaymentData.domain == sub.domain.name || sub.domain.name.toUpperCase() == "ALL").forEach(async (sub: any) => {
-      const channel = getDiscordChannel(discordClient, sub.discordChannel.idDiscord);
-      await channel.send(message);
-    })
+
+    //@ts-ignore
+    notifsSubs
+      .filter(
+        (sub: { domain: any }) =>
+          colonyPaymentData.domain == sub.domain.name ||
+          sub.domain.name.toUpperCase() == "ALL"
+      )
+      .forEach(async (sub: any) => {
+        const channel = getDiscordChannel(
+          discordClient,
+          sub.discordChannel.idDiscord
+        );
+        await channel.send(message);
+      });
   }
 }
 
@@ -192,7 +200,7 @@ function getDiscordChannel(
 
 async function parsePaymentData(data: any): Promise<colonyPaymentData> {
   const paymentInfo = data.payment;
- 
+
   const fundPot = paymentInfo.fundingPot.fundingPotPayouts[0];
   const decimals = Math.pow(10, fundPot.token.decimals);
   const fundingAmount = fundPot.amount / decimals;
@@ -223,7 +231,7 @@ async function parsePaymentData(data: any): Promise<colonyPaymentData> {
       if (response.status == 200) {
         const domainResponse: any = await response.text();
         const domainJson = JSON.parse(domainResponse);
-       
+
         domain = domainJson.data
           ? domainJson.data.domainName
           : domainJson.domainName;

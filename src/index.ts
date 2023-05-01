@@ -7,7 +7,7 @@ import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
 
 import * as dotenv from "dotenv";
-import { ServerConfig } from "./ServerConfig";
+
 dotenv.config();
 
 const client = new Discord.Client({
@@ -23,10 +23,7 @@ run();
 client.once("ready", listenToColonyEvent);
 
 function listenToColonyEvent(): void {
-  runPayment(client, ServerConfig.test.notificationsTest);
-  // runPayment(client, ServerConfig.shapeShift)
+  runPayment(client);
+  runMotion(client)
 
-  // runMotion(client, ServerConfig.test.notificationsTest)
-  // runMotion(client, ServerConfig.shapeShift)
-  // runMotion(client, ServerConfig.eli5)
 }

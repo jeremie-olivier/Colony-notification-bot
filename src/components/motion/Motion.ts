@@ -5,10 +5,11 @@ const Discord = require("discord.js");
 import * as dotenv from "dotenv";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode } from "graphql";
+import { notificationsSubs } from "../../utility/NotificationToDiscord";
 
 dotenv.config();
 
-export async function runMotion(discordClient: any, config: any): Promise<any> {
+export async function runMotion(discordClient: any): Promise<any> {
   const GQL = getGQLrequest();
   const GQLVARIABLES = getGqlVariables();
   const subscription = getGqlSubscription(GQL, GQLVARIABLES);
@@ -17,7 +18,7 @@ export async function runMotion(discordClient: any, config: any): Promise<any> {
     subscribe((r) =>
       createAndSendMessage(
         discordClient,
-        config,
+
         // @ts-ignore
         r.data.motions[0]
       )
@@ -29,26 +30,34 @@ let lastMotion: string;
 
 async function createAndSendMessage(
   discordClient: any,
-  config: any,
+
   result: any
 ): Promise<void> {
   let colonyMotionData = await parseMotionData(result);
 
+  let notifsSubs: any = await notificationsSubs(colonyMotionData.colonyName);
+
   if (colonyMotionData.transactionId != lastMotion) {
     const embed = getEmbed(
       colonyMotionData,
-      config,
       result.transaction.block.timestamp
     );
     const message = getDiscordMessage(embed, colonyMotionData);
     lastMotion = colonyMotionData.transactionId;
-  
 
-    if (colonyMotionData.colonyName != config.colony) return;
-    // @ts-ignore
-    if (!config.motion) return;
-    const channel = getDiscordChannel(discordClient, config.motion);
-    await channel.send(message);
+    notifsSubs
+      .filter(
+        (sub: { domain: any }) =>
+          colonyMotionData.domain == sub.domain.name ||
+          sub.domain.name.toUpperCase() == "ALL"
+      )
+      .forEach(async (sub: any) => {
+        const channel = getDiscordChannel(
+          discordClient,
+          sub.discordChannel.idDiscord
+        );
+        await channel.send(message);
+      });
   }
 }
 
@@ -74,7 +83,7 @@ function getGQLrequest(): any {
           block {
             timestamp
           }
-		  id
+          id
         }
         associatedColony {
           id
@@ -107,19 +116,17 @@ function getGqlSubscription(
   return subscription;
 }
 
-function getEmbed(p: colonyMotionData, config: any, timestamp: number) {
+function getEmbed(p: colonyMotionData, timestamp: number) {
   const embed = new EmbedBuilder()
     .setColor(0xf7c325)
     .setTitle("New Motion Event")
-    .setDescription(
-      `**Motion details** : Work in progress ( coming soon )`
-    )
+    .setDescription(`**Motion details** : Work in progress ( coming soon )`)
     .setThumbnail(
       "https://cdn.discordapp.com/attachments/1087723564154749000/1095023300297625771/Motion.png"
     )
     .setAuthor({
       name: `${p.colonyName}`,
-      iconURL: `${config.url}`,
+      //iconURL: `${config.url}`,
     })
     .addFields({ value: `In **${p.domain}** team.`, name: "\u200B" })
     .setFooter({
@@ -170,7 +177,7 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
   const TsxId: string = motionInfo.transaction.id;
 
   const domainMeta = motionInfo.domain.metadata;
-    let domain = motionInfo.domain.name;
+  let domain = motionInfo.domain.name;
 
   if (domainMeta) {
     try {
@@ -180,10 +187,11 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
 
       if (response.status == 200) {
         const domainResponse: any = await response.text();
-        
-        const domainJson = JSON.parse(domainResponse)
-        domain = domainJson.data? domainJson.data.domainName: domainJson.domainName;
 
+        const domainJson = JSON.parse(domainResponse);
+        domain = domainJson.data
+          ? domainJson.data.domainName
+          : domainJson.domainName;
       }
     } catch (error) {
       console.error(`Error fetching IPFS domain: ${error}`);
@@ -198,7 +206,7 @@ async function parseMotionData(data: any): Promise<colonyMotionData> {
     colonyTickers: motionInfo.associatedColony.token.symbol,
     transactionId: formatAddress(TsxId),
     requiredStake: motionInfo.requiredStake,
-    tsxId: motionInfo.transaction.id
+    tsxId: motionInfo.transaction.id,
   };
   return motionData;
 }
@@ -211,7 +219,7 @@ interface colonyMotionData {
   colonyTickers: string;
   transactionId: string;
   requiredStake: string;
-  tsxId: string,
+  tsxId: string;
 }
 
 function formatAddress(address: string, size = 4) {
