@@ -4,6 +4,9 @@ import "./styles/tailwind.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import React from 'react';
+import { Amplify } from "aws-amplify";
+import awsconfig from "../src/aws-exports";
+Amplify.configure(awsconfig);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

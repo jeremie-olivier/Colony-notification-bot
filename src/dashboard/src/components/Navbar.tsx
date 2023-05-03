@@ -1,7 +1,10 @@
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
   return (
-    <div>TEST</div>
+    <div className="bg-sky-900 text-white">
+       <Link to="/adminPage">Admin Dashboard</Link>
+    </div>
   )
 }
