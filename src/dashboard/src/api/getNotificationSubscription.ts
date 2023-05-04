@@ -32,8 +32,8 @@ export async function getNotificationSubscription(colonyName: string) {
                   id
                 }
               }
+              createdAt
             }
-           createdAt
           }
         
         }

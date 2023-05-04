@@ -16,8 +16,7 @@ export const AdminPage = ({ colonyName = "notificationstest" }) => {
   }, [colonyName]);
 
   return (
-<div>
-    <p>TEST</p>
+
 <div className="m-6 relative overflow-x-auto shadow-md sm:rounded-lg">
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-indigo-300 dark:bg-gray-700 dark:text-gray-400">
@@ -60,17 +59,17 @@ export const AdminPage = ({ colonyName = "notificationstest" }) => {
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.colonyEventType?.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.domain?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.discordChannel?.name}</td>
-                {/* <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items[0]?.id}</td> */}
+                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items[0]?.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items[0]?.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap flex space-x-3">
-                    <a href="#" className="font-medium  text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                    <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</a>
+                    <a href="/" className="font-medium  text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="/" className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</a>
                 </td>
               </tr>
             ))}
         </tbody>
     </table>
 </div>
-</div>
+
   )
 }
