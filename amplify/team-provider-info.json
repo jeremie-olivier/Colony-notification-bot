@@ -52,5 +52,23 @@
         "ColonyNotifications": {}
       }
     }
+  },
+  "testtwo": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colonynotifications-testtwo-183351-authRole",
+      "UnauthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-testtwo-183351-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::208457094315:role/amplify-colonynotifications-testtwo-183351-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-colonynotifications-testtwo-183351-deployment",
+      "UnauthRoleName": "amplify-colonynotifications-testtwo-183351-unauthRole",
+      "StackName": "amplify-colonynotifications-testtwo-183351",
+      "StackId": "arn:aws:cloudformation:eu-west-3:208457094315:stack/amplify-colonynotifications-testtwo-183351/a07de140-eb62-11ed-8630-0a806699bd88",
+      "AmplifyAppId": "d2g3qlkg47j2yi"
+    },
+    "categories": {
+      "api": {
+        "ColonyNotifications": {}
+      }
+    }
   }
 }

@@ -26,12 +26,27 @@ export const schema = {
                         ]
                     }
                 },
-                "discordServer": {
-                    "name": "discordServer",
+                "discordServerId": {
+                    "name": "discordServerId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
                     "attributes": []
+                },
+                "discordServer": {
+                    "name": "discordServer",
+                    "isArray": false,
+                    "type": {
+                        "model": "DiscordServer"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "discordServerId"
+                        ]
+                    }
                 },
                 "idDiscord": {
                     "name": "idDiscord",
@@ -76,7 +91,7 @@ export const schema = {
                     "properties": {
                         "name": "byDiscordServer",
                         "fields": [
-                            "discordServer"
+                            "discordServerId"
                         ]
                     }
                 },
@@ -195,10 +210,6 @@ export const schema = {
                     "properties": {}
                 },
                 {
-                    "type": "searchable",
-                    "properties": {}
-                },
-                {
                     "type": "auth",
                     "properties": {
                         "rules": [
@@ -243,6 +254,21 @@ export const schema = {
                 "user": {
                     "name": "user",
                     "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userId"
+                        ]
+                    }
+                },
+                "userId": {
+                    "name": "userId",
+                    "isArray": false,
                     "type": "ID",
                     "isRequired": true,
                     "attributes": []
@@ -285,7 +311,7 @@ export const schema = {
                     "properties": {
                         "name": "byUser",
                         "fields": [
-                            "user"
+                            "userId"
                         ]
                     }
                 },
@@ -377,6 +403,21 @@ export const schema = {
                         ]
                     }
                 },
+                "author": {
+                    "name": "author",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "authorId"
+                        ]
+                    }
+                },
                 "colonyId": {
                     "name": "colonyId",
                     "isArray": false,
@@ -405,8 +446,8 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "author": {
-                    "name": "author",
+                "authorId": {
+                    "name": "authorId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
@@ -509,7 +550,7 @@ export const schema = {
                     "properties": {
                         "name": "byUser",
                         "fields": [
-                            "author"
+                            "authorId"
                         ]
                     }
                 },
@@ -1218,5 +1259,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.0",
-    "version": "94120a98173618ff8d189a0f03aa8d9e"
+    "version": "1b1d77ba1654364b0c8b978b69cdaede"
 };

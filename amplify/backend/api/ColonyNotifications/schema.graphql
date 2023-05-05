@@ -7,12 +7,13 @@ enum EventType {
 type DiscordChannel @model @auth(rules: [{allow: public}]) {
   id: ID!
   notificationSubscriptions: [NotificationSubscription] @hasMany(indexName: "byDiscordChannelSubscription", fields: ["id"])
-  discordServer: ID! @index(name: "byDiscordServer")
+  discordServerId: ID! @index(name: "byDiscordServer")
+  discordServer: DiscordServer @belongsTo(fields: ["discordServerId"])
   idDiscord: String
   name: String
 }
 
-type Colony @model @auth(rules: [{allow: public}]) @searchable {
+type Colony @model @auth(rules: [{allow: public}])  {
   
   id: ID!
   notifyInDiscordServers: [DiscordServer] @manyToMany(relationName: "ColonyDiscordServer")
@@ -26,7 +27,8 @@ type Mention @model @auth(rules: [{allow: public}]) {
   id: ID!
   idDiscordRole: String
   notificationSubscription: ID! @index(name: "byNotificationSubscription")
-  user: ID! @index(name: "byUser")
+  user: User @belongsTo(fields: ["userId"])
+  userId: ID! @index(name: "byUser")
 }
 
 type NotificationSubscription @model @auth(rules: [{allow: public}]) {
@@ -36,13 +38,14 @@ type NotificationSubscription @model @auth(rules: [{allow: public}]) {
   domain: Domain @belongsTo(fields: ["domainId"])
   discordChannel: DiscordChannel @belongsTo(fields: ["discordChannelId"])
   colonyEventType: ColonyEventType @belongsTo(fields: ["colonyEventTypeId"])
+  author: User @belongsTo(fields: ["authorId"])
 
   colonyId: ID! @index(name: "byColonySubscription")
   domainId: ID! @index(name: "byDomainSubscription")
   discordChannelId: ID! @index(name:"byDiscordChannelSubscription")
   colonyEventTypeId: ID! @index(name:"byColonyEventTypeSubscription")
 
-  author: ID! @index(name: "byUser")
+  authorId: ID! @index(name: "byUser")
   hits: [Hit] @hasMany(indexName: "byNotificationSubscription", fields: ["id"])
   mentions: [Mention] @hasMany(indexName: "byNotificationSubscription", fields: ["id"])
 }

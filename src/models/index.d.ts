@@ -17,7 +17,8 @@ type EagerDiscordChannel = {
   };
   readonly id: string;
   readonly notificationSubscriptions?: (NotificationSubscription | null)[] | null;
-  readonly discordServer: string;
+  readonly discordServerId: string;
+  readonly discordServer?: DiscordServer | null;
   readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
@@ -31,7 +32,8 @@ type LazyDiscordChannel = {
   };
   readonly id: string;
   readonly notificationSubscriptions: AsyncCollection<NotificationSubscription>;
-  readonly discordServer: string;
+  readonly discordServerId: string;
+  readonly discordServer: AsyncItem<DiscordServer | undefined>;
   readonly idDiscord?: string | null;
   readonly name?: string | null;
   readonly createdAt?: string | null;
@@ -88,7 +90,8 @@ type EagerMention = {
   readonly id: string;
   readonly idDiscordRole?: string | null;
   readonly notificationSubscription: string;
-  readonly user: string;
+  readonly user?: User | null;
+  readonly userId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -101,7 +104,8 @@ type LazyMention = {
   readonly id: string;
   readonly idDiscordRole?: string | null;
   readonly notificationSubscription: string;
-  readonly user: string;
+  readonly user: AsyncItem<User | undefined>;
+  readonly userId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -122,11 +126,12 @@ type EagerNotificationSubscription = {
   readonly domain?: Domain | null;
   readonly discordChannel?: DiscordChannel | null;
   readonly colonyEventType?: ColonyEventType | null;
+  readonly author?: User | null;
   readonly colonyId: string;
   readonly domainId: string;
   readonly discordChannelId: string;
   readonly colonyEventTypeId: string;
-  readonly author: string;
+  readonly authorId: string;
   readonly hits?: (Hit | null)[] | null;
   readonly mentions?: (Mention | null)[] | null;
   readonly createdAt?: string | null;
@@ -143,11 +148,12 @@ type LazyNotificationSubscription = {
   readonly domain: AsyncItem<Domain | undefined>;
   readonly discordChannel: AsyncItem<DiscordChannel | undefined>;
   readonly colonyEventType: AsyncItem<ColonyEventType | undefined>;
+  readonly author: AsyncItem<User | undefined>;
   readonly colonyId: string;
   readonly domainId: string;
   readonly discordChannelId: string;
   readonly colonyEventTypeId: string;
-  readonly author: string;
+  readonly authorId: string;
   readonly hits: AsyncCollection<Hit>;
   readonly mentions: AsyncCollection<Mention>;
   readonly createdAt?: string | null;
