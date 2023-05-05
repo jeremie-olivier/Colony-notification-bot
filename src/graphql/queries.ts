@@ -13,7 +13,7 @@ export const getDiscordChannel = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -23,7 +23,30 @@ export const getDiscordChannel = /* GraphQL */ `
         nextToken
         startedAt
       }
-      discordServer
+      discordServerId
+      discordServer {
+        id
+        hasColonyNotificationBotAdded
+        managedByUsers {
+          nextToken
+          startedAt
+        }
+        colonies {
+          nextToken
+          startedAt
+        }
+        channels {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        name
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       idDiscord
       name
       createdAt
@@ -47,7 +70,18 @@ export const listDiscordChannels = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -80,7 +114,18 @@ export const syncDiscordChannels = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -94,16 +139,16 @@ export const syncDiscordChannels = /* GraphQL */ `
     }
   }
 `;
-export const discordChannelsByDiscordServer = /* GraphQL */ `
-  query DiscordChannelsByDiscordServer(
-    $discordServer: ID!
+export const discordChannelsByDiscordServerId = /* GraphQL */ `
+  query DiscordChannelsByDiscordServerId(
+    $discordServerId: ID!
     $sortDirection: ModelSortDirection
     $filter: ModelDiscordChannelFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    discordChannelsByDiscordServer(
-      discordServer: $discordServer
+    discordChannelsByDiscordServerId(
+      discordServerId: $discordServerId
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -115,7 +160,18 @@ export const discordChannelsByDiscordServer = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -154,7 +210,7 @@ export const getColony = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -262,71 +318,35 @@ export const syncColonies = /* GraphQL */ `
     }
   }
 `;
-export const searchColonies = /* GraphQL */ `
-  query SearchColonies(
-    $filter: SearchableColonyFilterInput
-    $sort: [SearchableColonySortInput]
-    $limit: Int
-    $nextToken: String
-    $from: Int
-    $aggregates: [SearchableColonyAggregationInput]
-  ) {
-    searchColonies(
-      filter: $filter
-      sort: $sort
-      limit: $limit
-      nextToken: $nextToken
-      from: $from
-      aggregates: $aggregates
-    ) {
-      items {
-        id
-        notifyInDiscordServers {
-          nextToken
-          startedAt
-        }
-        notificationSubscriptions {
-          nextToken
-          startedAt
-        }
-        name
-        domains {
-          nextToken
-          startedAt
-        }
-        url
-        createdAt
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-      }
-      nextToken
-      total
-      aggregateItems {
-        name
-        result {
-          ... on SearchableAggregateScalarResult {
-            value
-          }
-          ... on SearchableAggregateBucketResult {
-            buckets {
-              key
-              doc_count
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 export const getMention = /* GraphQL */ `
   query GetMention($id: ID!) {
     getMention(id: $id) {
       id
       idDiscordRole
       notificationSubscription
-      user
+      user {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      userId
       createdAt
       updatedAt
       _version
@@ -346,7 +366,17 @@ export const listMentions = /* GraphQL */ `
         id
         idDiscordRole
         notificationSubscription
-        user
+        user {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        userId
         createdAt
         updatedAt
         _version
@@ -375,7 +405,17 @@ export const syncMentions = /* GraphQL */ `
         id
         idDiscordRole
         notificationSubscription
-        user
+        user {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        userId
         createdAt
         updatedAt
         _version
@@ -406,7 +446,17 @@ export const mentionsByNotificationSubscription = /* GraphQL */ `
         id
         idDiscordRole
         notificationSubscription
-        user
+        user {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        userId
         createdAt
         updatedAt
         _version
@@ -418,16 +468,16 @@ export const mentionsByNotificationSubscription = /* GraphQL */ `
     }
   }
 `;
-export const mentionsByUser = /* GraphQL */ `
-  query MentionsByUser(
-    $user: ID!
+export const mentionsByUserId = /* GraphQL */ `
+  query MentionsByUserId(
+    $userId: ID!
     $sortDirection: ModelSortDirection
     $filter: ModelMentionFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    mentionsByUser(
-      user: $user
+    mentionsByUserId(
+      userId: $userId
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -437,7 +487,17 @@ export const mentionsByUser = /* GraphQL */ `
         id
         idDiscordRole
         notificationSubscription
-        user
+        user {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        userId
         createdAt
         updatedAt
         _version
@@ -495,7 +555,18 @@ export const getNotificationSubscription = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -517,11 +588,33 @@ export const getNotificationSubscription = /* GraphQL */ `
         _deleted
         _lastChangedAt
       }
+      author {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       colonyId
       domainId
       discordChannelId
       colonyEventTypeId
-      author
+      authorId
       hits {
         items {
           id
@@ -541,7 +634,7 @@ export const getNotificationSubscription = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -594,7 +687,7 @@ export const listNotificationSubscriptions = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -612,11 +705,21 @@ export const listNotificationSubscriptions = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -673,7 +776,7 @@ export const syncNotificationSubscriptions = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -691,11 +794,21 @@ export const syncNotificationSubscriptions = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -754,7 +867,7 @@ export const notificationSubscriptionsByColonyId = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -772,11 +885,21 @@ export const notificationSubscriptionsByColonyId = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -835,7 +958,7 @@ export const notificationSubscriptionsByDomainId = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -853,11 +976,21 @@ export const notificationSubscriptionsByDomainId = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -916,7 +1049,7 @@ export const notificationSubscriptionsByDiscordChannelId = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -934,11 +1067,21 @@ export const notificationSubscriptionsByDiscordChannelId = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -997,7 +1140,7 @@ export const notificationSubscriptionsByColonyEventTypeId = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -1015,11 +1158,21 @@ export const notificationSubscriptionsByColonyEventTypeId = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -1039,16 +1192,16 @@ export const notificationSubscriptionsByColonyEventTypeId = /* GraphQL */ `
     }
   }
 `;
-export const notificationSubscriptionsByAuthor = /* GraphQL */ `
-  query NotificationSubscriptionsByAuthor(
-    $author: ID!
+export const notificationSubscriptionsByAuthorId = /* GraphQL */ `
+  query NotificationSubscriptionsByAuthorId(
+    $authorId: ID!
     $sortDirection: ModelSortDirection
     $filter: ModelNotificationSubscriptionFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    notificationSubscriptionsByAuthor(
-      author: $author
+    notificationSubscriptionsByAuthorId(
+      authorId: $authorId
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -1078,7 +1231,7 @@ export const notificationSubscriptionsByAuthor = /* GraphQL */ `
         }
         discordChannel {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -1096,11 +1249,21 @@ export const notificationSubscriptionsByAuthor = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        author {
+          id
+          idDiscord
+          walletAddress
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         colonyId
         domainId
         discordChannelId
         colonyEventTypeId
-        author
+        authorId
         hits {
           nextToken
           startedAt
@@ -1156,7 +1319,7 @@ export const getDiscordServer = /* GraphQL */ `
       channels {
         items {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -1359,7 +1522,7 @@ export const getUser = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1374,7 +1537,7 @@ export const getUser = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -1493,7 +1656,7 @@ export const getColonyEventType = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1583,7 +1746,7 @@ export const getDomain = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version

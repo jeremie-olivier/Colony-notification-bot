@@ -8,24 +8,20 @@ export async function getNotificationSubscription(colonyName: string) {
     query: `query($filter: ModelColonyFilterInput) {
       listColonies(filter: $filter) {
         items {
-          name
           notificationSubscriptions {
             items {
+              id
               domain {
                 name
               }
-              author
               colonyEventType {
                 type
               }
-              mentions {
-                items {
-                  id
-                }
-              }
               discordChannel {
-                discordServer
                 name
+                discordServer {
+                  name
+                }
               }
               hits {
                 items {
@@ -33,9 +29,18 @@ export async function getNotificationSubscription(colonyName: string) {
                 }
               }
               createdAt
+              mentions {
+                items {
+                  user {
+                    idDiscord
+                  }
+                }
+              }
+              author {
+                idDiscord
+              }
             }
           }
-        
         }
       }
     }`,

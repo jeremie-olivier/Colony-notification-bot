@@ -15,7 +15,7 @@ export const onCreateDiscordChannel = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -25,7 +25,30 @@ export const onCreateDiscordChannel = /* GraphQL */ `
         nextToken
         startedAt
       }
-      discordServer
+      discordServerId
+      discordServer {
+        id
+        hasColonyNotificationBotAdded
+        managedByUsers {
+          nextToken
+          startedAt
+        }
+        colonies {
+          nextToken
+          startedAt
+        }
+        channels {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        name
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       idDiscord
       name
       createdAt
@@ -49,7 +72,7 @@ export const onUpdateDiscordChannel = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -59,7 +82,30 @@ export const onUpdateDiscordChannel = /* GraphQL */ `
         nextToken
         startedAt
       }
-      discordServer
+      discordServerId
+      discordServer {
+        id
+        hasColonyNotificationBotAdded
+        managedByUsers {
+          nextToken
+          startedAt
+        }
+        colonies {
+          nextToken
+          startedAt
+        }
+        channels {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        name
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       idDiscord
       name
       createdAt
@@ -83,7 +129,7 @@ export const onDeleteDiscordChannel = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -93,7 +139,30 @@ export const onDeleteDiscordChannel = /* GraphQL */ `
         nextToken
         startedAt
       }
-      discordServer
+      discordServerId
+      discordServer {
+        id
+        hasColonyNotificationBotAdded
+        managedByUsers {
+          nextToken
+          startedAt
+        }
+        colonies {
+          nextToken
+          startedAt
+        }
+        channels {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        name
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       idDiscord
       name
       createdAt
@@ -129,7 +198,7 @@ export const onCreateColony = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -188,7 +257,7 @@ export const onUpdateColony = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -247,7 +316,7 @@ export const onDeleteColony = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -287,7 +356,29 @@ export const onCreateMention = /* GraphQL */ `
       id
       idDiscordRole
       notificationSubscription
-      user
+      user {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      userId
       createdAt
       updatedAt
       _version
@@ -302,7 +393,29 @@ export const onUpdateMention = /* GraphQL */ `
       id
       idDiscordRole
       notificationSubscription
-      user
+      user {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      userId
       createdAt
       updatedAt
       _version
@@ -317,7 +430,29 @@ export const onDeleteMention = /* GraphQL */ `
       id
       idDiscordRole
       notificationSubscription
-      user
+      user {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      userId
       createdAt
       updatedAt
       _version
@@ -374,7 +509,18 @@ export const onCreateNotificationSubscription = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -396,11 +542,33 @@ export const onCreateNotificationSubscription = /* GraphQL */ `
         _deleted
         _lastChangedAt
       }
+      author {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       colonyId
       domainId
       discordChannelId
       colonyEventTypeId
-      author
+      authorId
       hits {
         items {
           id
@@ -420,7 +588,7 @@ export const onCreateNotificationSubscription = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -486,7 +654,18 @@ export const onUpdateNotificationSubscription = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -508,11 +687,33 @@ export const onUpdateNotificationSubscription = /* GraphQL */ `
         _deleted
         _lastChangedAt
       }
+      author {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       colonyId
       domainId
       discordChannelId
       colonyEventTypeId
-      author
+      authorId
       hits {
         items {
           id
@@ -532,7 +733,7 @@ export const onUpdateNotificationSubscription = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -598,7 +799,18 @@ export const onDeleteNotificationSubscription = /* GraphQL */ `
           nextToken
           startedAt
         }
-        discordServer
+        discordServerId
+        discordServer {
+          id
+          hasColonyNotificationBotAdded
+          idDiscord
+          name
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
         idDiscord
         name
         createdAt
@@ -620,11 +832,33 @@ export const onDeleteNotificationSubscription = /* GraphQL */ `
         _deleted
         _lastChangedAt
       }
+      author {
+        id
+        authorOfNotificationSubscriptions {
+          nextToken
+          startedAt
+        }
+        mentions {
+          nextToken
+          startedAt
+        }
+        idDiscord
+        walletAddress
+        managerOfDiscords {
+          nextToken
+          startedAt
+        }
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
       colonyId
       domainId
       discordChannelId
       colonyEventTypeId
-      author
+      authorId
       hits {
         items {
           id
@@ -644,7 +878,7 @@ export const onDeleteNotificationSubscription = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -700,7 +934,7 @@ export const onCreateDiscordServer = /* GraphQL */ `
       channels {
         items {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -760,7 +994,7 @@ export const onUpdateDiscordServer = /* GraphQL */ `
       channels {
         items {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -820,7 +1054,7 @@ export const onDeleteDiscordServer = /* GraphQL */ `
       channels {
         items {
           id
-          discordServer
+          discordServerId
           idDiscord
           name
           createdAt
@@ -895,7 +1129,7 @@ export const onCreateUser = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -910,7 +1144,7 @@ export const onCreateUser = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -955,7 +1189,7 @@ export const onUpdateUser = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -970,7 +1204,7 @@ export const onUpdateUser = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -1015,7 +1249,7 @@ export const onDeleteUser = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1030,7 +1264,7 @@ export const onDeleteUser = /* GraphQL */ `
           id
           idDiscordRole
           notificationSubscription
-          user
+          userId
           createdAt
           updatedAt
           _version
@@ -1077,7 +1311,7 @@ export const onCreateColonyEventType = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1109,7 +1343,7 @@ export const onUpdateColonyEventType = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1141,7 +1375,7 @@ export const onDeleteColonyEventType = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1171,7 +1405,7 @@ export const onCreateDomain = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1202,7 +1436,7 @@ export const onUpdateDomain = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version
@@ -1233,7 +1467,7 @@ export const onDeleteDomain = /* GraphQL */ `
           domainId
           discordChannelId
           colonyEventTypeId
-          author
+          authorId
           createdAt
           updatedAt
           _version

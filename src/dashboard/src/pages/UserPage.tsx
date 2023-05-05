@@ -1,30 +1,23 @@
-import { useState, useEffect } from 'react';
-import { getNotificationSubscription } from '../api/getNotificationSubscription';
-import { NotificationSubscription } from '../../../API';
+import React from 'react'
+import { useState, useEffect } from 'react'
+import { getNotificationSubscription } from '../api/getNotificationSubscription'
+import { NotificationSubscription } from '../../../API'
 
-
-
-export const AdminPage = ({ colonyName = "notificationstest" }) => {
-  const [notificationSubscriptions, setNotificationSubscriptions] = useState<NotificationSubscription[]>([]);
+export const UserPage = ({ colonyName = "notificationtest" }) => {
+    const [notificationSubscriptions, setNotificationSubscriptions] = useState<NotificationSubscription[]>([]);
 
   useEffect(() => {
     async function fetchNotificationSubscriptions() {
       const response = await getNotificationSubscription("notificationstest");
-      debugger
       setNotificationSubscriptions(response);
     }
     fetchNotificationSubscriptions();
   }, [colonyName]);
-
   return (
-
-<div className="m-6 relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div className="m-6 relative overflow-x-auto shadow-md sm:rounded-lg">
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-indigo-300 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" className="px-6 py-3">
-                    Servers
-                </th>
                 <th scope="col" className="px-6 py-3">
                     Created at
                 </th>
@@ -54,14 +47,13 @@ export const AdminPage = ({ colonyName = "notificationstest" }) => {
         <tbody>
             {notificationSubscriptions.map((notificationSubscription) => (
                 <tr key={notificationSubscription.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.discordChannel?.discordServer?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.createdAt}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.author?.idDiscord}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.colonyEventType?.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.domain?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.discordChannel?.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items.map(m => `${m?.user?.idDiscord} `)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items.length}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items[0]?.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items[0]?.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap flex space-x-3">
                     <a href="/" className="font-medium  text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                     <a href="/" className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</a>
