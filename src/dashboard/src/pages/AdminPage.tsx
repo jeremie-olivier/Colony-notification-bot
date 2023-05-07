@@ -59,7 +59,7 @@ export const AdminPage = ({ colonyName = "notificationstest" }) => {
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.author?.idDiscord}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.colonyEventType?.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.domain?.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.discordChannel?.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">@{notificationSubscription.discordChannel?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items.map(m => `${m?.user?.idDiscord} `)}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items.length}</td>
                 <td className="px-6 py-4 whitespace-nowrap flex space-x-3">

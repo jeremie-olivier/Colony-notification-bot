@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { getNotificationSubscription } from '../api/getNotificationSubscription'
 import { NotificationSubscription } from '../../../API'
 
+
+
 export const UserPage = ({ colonyName = "notificationtest" }) => {
     const [notificationSubscriptions, setNotificationSubscriptions] = useState<NotificationSubscription[]>([]);
 
@@ -33,9 +35,9 @@ export const UserPage = ({ colonyName = "notificationtest" }) => {
                 <th scope="col" className="px-6 py-3">
                     Channel
                 </th>
-                <th scope="col" className="px-6 py-3">
+                {/* <th scope="col" className="px-6 py-3">
                     Mention
-                </th>
+                </th> */}
                 <th scope="col" className="px-6 py-3">
                     Hits
                 </th>
@@ -48,12 +50,12 @@ export const UserPage = ({ colonyName = "notificationtest" }) => {
             {notificationSubscriptions.map((notificationSubscription) => (
                 <tr key={notificationSubscription.id}>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.createdAt}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.author?.idDiscord}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.colonyEventType?.type}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.domain?.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.discordChannel?.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items[0]?.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items[0]?.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">@{notificationSubscription.discordChannel?.name}</td>
+                {/* <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.mentions?.items.map(m => `${m?.user?.idDiscord} `)}</td> */}
+                <td className="px-6 py-4 whitespace-nowrap">{notificationSubscription.hits?.items.length}</td>
                 <td className="px-6 py-4 whitespace-nowrap flex space-x-3">
                     <a href="/" className="font-medium  text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                     <a href="/" className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</a>
