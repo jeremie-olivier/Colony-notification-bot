@@ -4,9 +4,11 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "outDir": "dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": true
   },
   "include": [
     "src/index.ts",
