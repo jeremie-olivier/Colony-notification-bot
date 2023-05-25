@@ -9,7 +9,11 @@ const app: Express = express();
 const port = 9000;
 
 export function discordAPIListner(client: any) {
-  app.use(cors);
+  app.use(
+    cors({
+      origin: "*",
+    })
+  );
   app.get("/guild/:guildID/roles", async (req: Request, res: Response) => {
     const guild = await client.guilds.fetch(req.params.guildID);
     const roles = await guild.roles.fetch();
@@ -21,8 +25,37 @@ export function discordAPIListner(client: any) {
       return newRole;
     });
 
-    res.json(cleanedRoles);
+    res.send(cleanedRoles);
   });
+
+  app.get(
+    "/guild/:guildID/role/:roleID",
+    async (req: Request, res: Response) => {
+      const guild = await client.guilds.fetch(req.params.guildID);
+      const role = await guild.roles.fetch(req.params.roleID);
+
+      let newRole = {
+        id: role.id,
+        name: role.name,
+      };
+      res.send(newRole);
+    }
+  );
+
+  app.get(
+    "/guild/:guildID/user/:userID",
+    async (req: Request, res: Response) => {
+      const guild = await client.guilds.fetch(req.params.guildID);
+      const user = await guild.members.fetch(req.params.userID);
+
+      let newUser = {
+        idDiscord: user.id,
+        name: user.displayName,
+        avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.user.avatar}.webp`,
+      };
+      res.send(newUser);
+    }
+  );
 
   app.get("/guild/:guildID/users", async (req: Request, res: Response) => {
     const guild = await client.guilds.fetch(req.params.guildID);
@@ -40,7 +73,7 @@ export function discordAPIListner(client: any) {
       return newUser;
     });
 
-    res.json(cleanedUsers);
+    res.send(cleanedUsers);
   });
 
   app.listen(port, () => {
