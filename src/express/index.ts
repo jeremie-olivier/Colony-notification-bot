@@ -3,11 +3,13 @@
 // const port = 3000;
 
 import express, { Express, Request, Response } from "express";
+import cors from "cors";
 
 const app: Express = express();
-const port = 3000;
+const port = 9000;
 
 export function discordAPIListner(client: any) {
+  app.use(cors);
   app.get("/guild/:guildID/roles", async (req: Request, res: Response) => {
     const guild = await client.guilds.fetch(req.params.guildID);
     const roles = await guild.roles.fetch();
